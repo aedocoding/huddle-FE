@@ -29,9 +29,7 @@ const App: () => React.ReactNode = () => {
   return (
     <>
       <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
+        <View style={styles.homeScreen}>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.createButton} onPress={() => {}}>
               <Text style={{color: '#ffbe5c', fontSize: 20}}>
@@ -46,7 +44,7 @@ const App: () => React.ReactNode = () => {
               <FontAwesomeIcon icon={faUsers} color="white" size={32} />
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       </SafeAreaView>
     </>
   );
@@ -80,7 +78,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffbe5c',
     borderColor: '#ffbe5c',
   },
-  scrollView: {
+  homeScreen: {
     backgroundColor: Colors.gray,
     paddingTop: 150,
   },
