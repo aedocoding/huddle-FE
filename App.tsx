@@ -19,33 +19,29 @@ import {
   TextInput,
   Modal,
 } from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {connect} from 'react-redux';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faCoffee} from '@fortawesome/free-solid-svg-icons';
-import {faUsers} from '@fortawesome/free-solid-svg-icons';
+import HomeScreen from './screens/HomeScreen'
+import CreateHuddleScreen from './screens/CreateHuddleScreen'
+import JoinHuddleScreen from './screens/JoinHuddleScreen'
+import HuddleScreen from './screens/HuddleScreen'
 
+
+
+const Stack = createStackNavigator();
 const App: () => React.ReactNode = () => {
   return (
     <>
-      <SafeAreaView>
-        <View style={styles.homeScreen}>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.createButton} onPress={() => {}}>
-              <Text style={{color: '#ffbe5c', fontSize: 20}}>
-                Create Huddle
-              </Text>
-              <FontAwesomeIcon icon={faCoffee} color="orange" size={32} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.joinButton} onPress={() => {}}>
-              <Text style={{color: 'white', fontSize: 20}}>Join Huddle</Text>
-              <FontAwesomeIcon icon={faUsers} color="white" size={32} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </SafeAreaView>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName={"Home"}>
+          <Stack.Screen name="Home" component={HomeScreen}  options={{ title: '' }}/>
+          <Stack.Screen name="Create Huddle" component={CreateHuddleScreen}  options={{ title: '' }} />
+          <Stack.Screen name="Join Huddle" component={JoinHuddleScreen}  options={{ title: '' }} />
+          <Stack.Screen name="Huddle" component={HuddleScreen}  options={{ title: '' }} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </>
   );
 };
