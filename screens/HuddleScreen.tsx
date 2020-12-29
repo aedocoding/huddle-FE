@@ -23,13 +23,15 @@ const HuddleScreen = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <SafeAreaView>
-      {fakeNames.map((name) => {
-        return (
-          <View style={{alignItems: 'center', marginBottom: 10}} key={name}>
-            <Text>{name}</Text>
-          </View>
-        );
-      })}
+      <View style={{marginTop: 100}}> 
+        {fakeNames.map((name) => {
+          return (
+            <View style={{alignItems: 'center', marginBottom: 10}} key={name}>
+              <Text>{name}</Text>
+            </View>
+          );
+        })}
+      </View>
       <View style={{alignItems: 'center', marginBottom: 125}}>
         <Text style={{color: '#ffbe5c', fontSize: 30}}>{timer}</Text>
       </View>
@@ -43,10 +45,12 @@ const HuddleScreen = ({navigation}) => {
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <TextInput style={styles.modalText} placeholder={'10:00'}></TextInput>
+              <TextInput
+                style={styles.modalText}
+                placeholder={'10:00'}></TextInput>
 
               <TouchableHighlight
-                style={{...styles.openButton, backgroundColor: '#2196F3'}}
+                style={{...styles.openButton, backgroundColor: '#ffbe5c'}}
                 onPress={() => {
                   setModalVisible(!modalVisible);
                 }}>
@@ -105,39 +109,38 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalView: {
     margin: 20,
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2
+      height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5
+    elevation: 5,
   },
   openButton: {
-    backgroundColor: "#F194FF",
+    backgroundColor: '#F194FF',
     borderRadius: 20,
     padding: 10,
-    elevation: 2
+    elevation: 2,
   },
   textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center"
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   modalText: {
     marginBottom: 15,
-    textAlign: "center"
-  }
+    textAlign: 'center',
+  },
 });
 export default HuddleScreen;
