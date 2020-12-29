@@ -18,7 +18,7 @@ const JoinHuddleScreen = ({navigation}) => {
 
         
       <View style={styles.center}>
-        <Text>Join a Huddle</Text>
+        <Text>Join Huddle</Text>
         <Text>Enter a room code below to join a huddle</Text>
       </View>
       <View style={{padding: 5}}>
