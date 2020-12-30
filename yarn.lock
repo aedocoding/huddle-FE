@@ -1177,11 +1177,15 @@
     superstruct "^0.6.2"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e2dbc106a927c646035117123187165209424966
 "@react-native-firebase/database@^10.3.1":
   version "10.3.1"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/database/-/database-10.3.1.tgz#e976f848b6834e46cf4dc2e2dd9776ef756f88a8"
   integrity sha512-ORJ+ByLKz6SMSWYLZxrDTPyW3ekjfrR6CK+3TkwXyTjtjgWsy3xNcBodC9k3DsGcg3daM3OjZPGihLOtxbRvzA==
 
+<<<<<<< HEAD
 "@react-native-firebase/firestore@^10.3.1":
   version "10.3.1"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/firestore/-/firestore-10.3.1.tgz#fbfd0a0bc9a724e3ff297c83c06c49637bb6409d"
@@ -1189,6 +1193,8 @@
 
 =======
 >>>>>>> 3856d88fe3b945107c0dc0b83d8c63e3f8b46704
+=======
+>>>>>>> e2dbc106a927c646035117123187165209424966
 "@react-navigation/core@^5.14.4":
   version "5.14.4"
   resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-5.14.4.tgz#f63a2cd214bddbd25e1181f9335c32dfc3b6460f"
