@@ -27,6 +27,12 @@ const JoinHuddleScreen = ({navigation}) => {
           <TextInput placeholder={'#12345'}></TextInput>
         </View>
       </View>
+      <View style={{padding: 5}}>
+        <Text>Your name</Text>
+        <View style={styles.centerInput}>
+          <TextInput placeholder={'Enter your name here'}></TextInput>
+        </View>
+      </View>
       <View style={styles.center}>
         <TouchableOpacity
           style={styles.joinButton}
