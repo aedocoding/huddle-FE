@@ -17,8 +17,11 @@
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-firebase/analytics": "^10.3.1",
     "@react-native-firebase/app": "^10.3.0",
+<<<<<<< HEAD
     "@react-native-firebase/database": "^10.3.1",
     "@react-native-firebase/firestore": "^10.3.1",
+=======
+>>>>>>> 3856d88fe3b945107c0dc0b83d8c63e3f8b46704
     "@react-navigation/native": "^5.8.10",
     "@react-navigation/stack": "^5.12.8",
     "react": "16.13.1",
