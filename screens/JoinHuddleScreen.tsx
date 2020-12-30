@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -12,6 +12,8 @@ import {
   Modal,
 } from 'react-native';
 const JoinHuddleScreen = ({navigation}) => {
+  const [invite, setInvite] = useState("")
+  const [username, setUsername] = useState("")
   return (
     <SafeAreaView>
         <View style={{marginTop: 150}}>
@@ -24,20 +26,27 @@ const JoinHuddleScreen = ({navigation}) => {
       <View style={{padding: 5}}>
         <Text>Invite Code</Text>
         <View style={styles.centerInput}>
-          <TextInput placeholder={'#12345'}></TextInput>
+          <TextInput placeholder={'#12345'} value ={invite} onChangeText={(inviteCode: string) => {
+            setInvite(inviteCode);
+            console.log(invite)
+     
+          }}></TextInput>
         </View>
       </View>
       <View style={{padding: 5}}>
         <Text>Your name</Text>
         <View style={styles.centerInput}>
-          <TextInput placeholder={'Enter your name here'}></TextInput>
+          <TextInput placeholder={'Enter your name here'}  value ={username} onChangeText={(name:string) => {
+            setUsername(name);
+            console.log(username)
+          }}></TextInput>
         </View>
       </View>
       <View style={styles.center}>
         <TouchableOpacity
           style={styles.joinButton}
           onPress={() => {
-            navigation.navigate('Huddle');
+            navigation.navigate('Huddle', [invite, username]);
           }}>
           <Text style={{color: 'white', fontSize: 15}}>Join Huddle</Text>
         </TouchableOpacity>

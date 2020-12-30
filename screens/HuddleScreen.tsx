@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -19,28 +19,34 @@ import {faClock} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 import firestore from '@react-native-firebase/firestore';
 
-const HuddleScreen = ({navigation}) => {
-  const roomInfo = firestore()
-  .collection('rooms')
-  .doc('secretcode')
-  .get()
-  .then(documentSnapshot => {
-    console.log('Your firebase data ', documentSnapshot.data());
+const HuddleScreen = (props: any, {navigation}: any) => {
+  useEffect(() => {
+    const myUsername = props.route.params[1];
+    firestore()
+      .collection('rooms')
+      .doc(`${props.route.params[0]}`)
+      .update({Users: firestore.FieldValue.arrayUnion(myUsername)})
+      .then(() => {
+        firestore()
+          .collection('rooms')
+          .doc(`${props.route.params[0]}`)
+          .get()
+          .then((documentSnapshot) => {
+            const firebase = documentSnapshot.data();
+            const currentUsers = firebase['Users'];
+            setUsers(currentUsers);
+            console.log(currentUsers);
+          });
+      });
+  }, []);
 
-    // querySnapshot.forEach(documentSnapshot => {
-    //   console.log('User ID: ', documentSnapshot.id, documentSnapshot.data());
-    // });
-  });
-  ;
-
-
-  const fakeNames = ['Your Name', 'Someone elses name', 'Another persons name'];
+  const [users, setUsers] = useState([]);
   const timer = '10:00';
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <SafeAreaView>
-      <View style={{marginTop: 100}}> 
-        {fakeNames.map((name) => {
+      <View style={{marginTop: 100}}>
+        {users.map((name) => {
           return (
             <View style={{alignItems: 'center', marginBottom: 10}} key={name}>
               <Text>{name}</Text>
