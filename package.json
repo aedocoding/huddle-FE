@@ -18,6 +18,7 @@
     "@react-native-firebase/analytics": "^10.3.1",
     "@react-native-firebase/app": "^10.3.0",
     "@react-native-firebase/database": "^10.3.1",
+    "@react-native-firebase/firestore": "^10.3.1",
     "@react-navigation/native": "^5.8.10",
     "@react-navigation/stack": "^5.12.8",
     "react": "16.13.1",

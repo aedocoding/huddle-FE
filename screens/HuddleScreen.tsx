@@ -17,7 +17,23 @@ import {faPlay} from '@fortawesome/free-solid-svg-icons';
 import {faStop} from '@fortawesome/free-solid-svg-icons';
 import {faClock} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
+import firestore from '@react-native-firebase/firestore';
+
 const HuddleScreen = ({navigation}) => {
+  const roomInfo = firestore()
+  .collection('rooms')
+  .doc('secretcode')
+  .get()
+  .then(documentSnapshot => {
+    console.log('Your firebase data ', documentSnapshot.data());
+
+    // querySnapshot.forEach(documentSnapshot => {
+    //   console.log('User ID: ', documentSnapshot.id, documentSnapshot.data());
+    // });
+  });
+  ;
+
+
   const fakeNames = ['Your Name', 'Someone elses name', 'Another persons name'];
   const timer = '10:00';
   const [modalVisible, setModalVisible] = useState(false);
