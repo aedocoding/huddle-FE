@@ -21,23 +21,35 @@ import firestore from '@react-native-firebase/firestore';
 
 const HuddleScreen = (props: any, {navigation}: any) => {
   useEffect(() => {
+    const subscriber = firestore()
+      .collection('rooms')
+      .doc(`${props.route.params[0]}`)
+      .onSnapshot((documentSnapshot) => {
+        const firebase = documentSnapshot.data();
+        const currentUsers = firebase['Users'];
+        setUsers(currentUsers);
+      });
+
+    // Stop listening for updates when no longer required
+    return () => subscriber();
+  }, []);
+  useEffect(() => {
     const myUsername = props.route.params[1];
     firestore()
       .collection('rooms')
       .doc(`${props.route.params[0]}`)
-      .update({Users: firestore.FieldValue.arrayUnion(myUsername)})
-      .then(() => {
-        firestore()
-          .collection('rooms')
-          .doc(`${props.route.params[0]}`)
-          .get()
-          .then((documentSnapshot) => {
-            const firebase = documentSnapshot.data();
-            const currentUsers = firebase['Users'];
-            setUsers(currentUsers);
-            console.log(currentUsers);
-          });
-      });
+      .update({Users: firestore.FieldValue.arrayUnion(myUsername)});
+    // .then(() => {
+    //   firestore()
+    //     .collection('rooms')
+    //     .doc(`${props.route.params[0]}`)
+    //     .get()
+    //     .then((documentSnapshot) => {
+    // const firebase = documentSnapshot.data();
+    // const currentUsers = firebase['Users'];
+    // setUsers(currentUsers);
+    //     });
+    // });
   }, []);
 
   const [users, setUsers] = useState([]);
@@ -102,7 +114,13 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         <TouchableOpacity
           style={styles.playButton}
           onPress={() => {
-            navigation.navigate('Home');
+            firestore()
+              .collection('rooms')
+              .doc(`${props.route.params[0]}`)
+              .update({
+                Users: firestore.FieldValue.arrayRemove(props.route.params[1]),
+              });
+            props.navigation.navigate('Home');
           }}>
           <Text style={{color: 'white', fontSize: 14}}>Exit Huddle</Text>
           <FontAwesomeIcon icon={faSignOutAlt} color="white" size={14} />
