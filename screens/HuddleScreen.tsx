@@ -18,8 +18,13 @@ import {faStop} from '@fortawesome/free-solid-svg-icons';
 import {faClock} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 import firestore from '@react-native-firebase/firestore';
+import Timer from '../components/Timer';
 
 const HuddleScreen = (props: any, {navigation}: any) => {
+  const [timer, setTimer] = useState("15")
+  const [users, setUsers] = useState([]);
+  const [session, setSession] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   useEffect(() => {
     const subscriber = firestore()
       .collection('rooms')
@@ -34,27 +39,26 @@ const HuddleScreen = (props: any, {navigation}: any) => {
     return () => subscriber();
   }, []);
   useEffect(() => {
+    const subscriber = firestore()
+      .collection('rooms')
+      .doc(`${props.route.params[0]}`)
+      .onSnapshot((documentSnapshot) => {
+        const firebase = documentSnapshot.data();
+        const active = firebase['active'];
+        setSession(active);
+      });
+
+    // Stop listening for updates when no longer required
+    return () => subscriber();
+  }, []);
+  useEffect(() => {
     const myUsername = props.route.params[1];
     firestore()
       .collection('rooms')
       .doc(`${props.route.params[0]}`)
       .update({Users: firestore.FieldValue.arrayUnion(myUsername)});
-    // .then(() => {
-    //   firestore()
-    //     .collection('rooms')
-    //     .doc(`${props.route.params[0]}`)
-    //     .get()
-    //     .then((documentSnapshot) => {
-    // const firebase = documentSnapshot.data();
-    // const currentUsers = firebase['Users'];
-    // setUsers(currentUsers);
-    //     });
-    // });
   }, []);
 
-  const [users, setUsers] = useState([]);
-  const timer = '10:00';
-  const [modalVisible, setModalVisible] = useState(false);
   return (
     <SafeAreaView>
       <View style={{marginTop: 100}}>
@@ -66,8 +70,8 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           );
         })}
       </View>
-      <View style={{alignItems: 'center', marginBottom: 125}}>
-        <Text style={{color: '#ffbe5c', fontSize: 30}}>{timer}</Text>
+      <View style={{alignItems: 'center', marginBottom: 15}}>
+        <Timer session={session} room={props.route.params[0]} />
       </View>
       <View style={styles.buttonContainer}>
         <Modal
@@ -81,23 +85,44 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             <View style={styles.modalView}>
               <TextInput
                 style={styles.modalText}
-                placeholder={'10:00'}></TextInput>
+                value={timer}
+                onChangeText={(startTime) => {
+                  setTimer(startTime)
+                }}></TextInput>
 
               <TouchableHighlight
                 style={{...styles.openButton, backgroundColor: '#ffbe5c'}}
                 onPress={() => {
                   setModalVisible(!modalVisible);
+                  firestore()
+                  .collection('rooms')
+                  .doc(`${props.route.params[0]}`)
+                  .update({Duration: parseInt(timer) * 60});
                 }}>
                 <Text style={styles.textStyle}>Set Timer</Text>
               </TouchableHighlight>
             </View>
           </View>
         </Modal>
-        <TouchableOpacity style={styles.playButton} onPress={() => {}}>
+        <TouchableOpacity
+          style={styles.playButton}
+          onPress={() => {
+            firestore()
+              .collection('rooms')
+              .doc(`${props.route.params[0]}`)
+              .update({active: true});
+          }}>
           <Text style={{color: 'white', fontSize: 14}}>Start Session</Text>
           <FontAwesomeIcon icon={faPlay} color="white" size={14} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.playButton} onPress={() => {}}>
+        <TouchableOpacity
+          style={styles.playButton}
+          onPress={() => {
+            firestore()
+              .collection('rooms')
+              .doc(`${props.route.params[0]}`)
+              .update({active: false});
+          }}>
           <Text style={{color: 'white', fontSize: 14}}>Stop Session</Text>
           <FontAwesomeIcon icon={faStop} color="white" size={14} />
         </TouchableOpacity>

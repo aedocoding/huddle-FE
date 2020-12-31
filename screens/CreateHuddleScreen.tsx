@@ -45,12 +45,17 @@ const CreateHuddleScreen = ({navigation}) => {
         <TouchableOpacity
           style={styles.createButton}
           onPress={() => {
+            const milliseconds = Date.now()
+            const date = new Date(milliseconds)
             firestore()
               .collection('rooms')
               .doc(`${room}`)
               .set({
                 Id: room,
-                Users: [], 
+                Users: [],
+                Timestamp: date.toString(),
+                Duration: 900,
+                active: false
               })
               .then(() => {
                 navigation.navigate('Huddle', [room, username]);
