@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -11,58 +11,87 @@ import {
   TextInput,
   Modal,
 } from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faCoffee} from '@fortawesome/free-solid-svg-icons';
+import firestore from '@react-native-firebase/firestore';
 const CreateHuddleScreen = ({navigation}) => {
-    return(
-        <SafeAreaView>
-            <View style={styles.nameHuddle}>
-            <TextInput placeholder={'Name your Huddle'}></TextInput>
-            </View>
-            <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.joinButton} onPress={() => {navigation.navigate('Huddle')}}>
-            <Text style={{color: 'white', fontSize: 20}}>Create Huddle</Text>
-            <FontAwesomeIcon icon={faCoffee} color="white" size={32} />
-          </TouchableOpacity>
+  const [room, setRoom] = useState('');
+  const [username, setUsername] = useState('');
+  return (
+    <SafeAreaView>
+      <View style={{marginTop: 150, marginBottom: 10, marginLeft: 5}}>
+        <Text>Your Huddle</Text>
+      </View>
+      <View style={styles.nameHuddle}>
+        <TextInput
+          placeholder={'Name your Huddle'}
+          value={room}
+          onChangeText={(roomCode: string) => {
+            setRoom(roomCode);
+            console.log(room);
+          }}></TextInput>
+      </View>
+      <View style={{padding: 5}}>
+        <Text>Your name</Text>
+        <View style={styles.centerInput}>
+          <TextInput
+            placeholder={'Enter your name here'}
+            value={username}
+            onChangeText={(name: string) => {
+              setUsername(name);
+              console.log(username);
+            }}></TextInput>
         </View>
-        </SafeAreaView>
-    )
-}
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.createButton}
+          onPress={() => {
+            firestore()
+              .collection('rooms')
+              .doc(`${room}`)
+              .set({
+                Id: room,
+                Users: [], 
+              })
+              .then(() => {
+                navigation.navigate('Huddle', [room, username]);
+              });
+          }}>
+          <Text style={{color: 'white', fontSize: 15}}>Create Huddle</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
 const styles = StyleSheet.create({
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        paddingTop: 5,
-        paddingBottom: 5,
-      },
-    nameHuddle: {
-      flexDirection: 'row',
-      justifyContent: 'space-evenly',
-      marginTop: 200,
-      paddingBottom: 10,
-      backgroundColor: 'white',
-      width: "100%"
-    },
-    createButton: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: 160,
-      height: 70,
-      borderRadius: 5,
-      borderWidth: 1.5,
-      marginTop: 20,
-      borderColor: '#ffbe5c',
-    },
-    joinButton: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: 160,
-      height: 70,
-      borderRadius: 5,
-      borderWidth: 0.5,
-      marginTop: 20,
-      backgroundColor: '#ffbe5c',
-      borderColor: '#ffbe5c',
-    }
-  });
-export default CreateHuddleScreen
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    paddingTop: 5,
+    paddingBottom: 5,
+  },
+  centerInput: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    marginTop: 5,
+  },
+  nameHuddle: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginBottom: 10,
+    paddingBottom: 10,
+    backgroundColor: 'white',
+    width: '100%',
+  },
+  createButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '95%',
+    height: 30,
+    borderRadius: 5,
+    borderWidth: 0.5,
+    marginTop: 20,
+    backgroundColor: '#ffbe5c',
+    borderColor: '#ffbe5c',
+  },
+});
+export default CreateHuddleScreen;
