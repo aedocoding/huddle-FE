@@ -58,9 +58,9 @@ const Timer = (props: any) => {
   });
 
   return (
-    <View>
+    <View style={{backgroundColor:'white', width: '100%', alignItems:'center'}}>
       {minutes === 0 && seconds === 0 ? null : (
-        <Text>
+        <Text style={{fontWeight: 'bold', fontSize: 50, color:'#ffbe5c'}}>
           {' '}
           {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
         </Text>
