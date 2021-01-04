@@ -17,6 +17,8 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlay} from '@fortawesome/free-solid-svg-icons';
 import {faStop} from '@fortawesome/free-solid-svg-icons';
 import {faClock} from '@fortawesome/free-solid-svg-icons';
+import {faCheck} from '@fortawesome/free-solid-svg-icons';
+import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 import firestore from '@react-native-firebase/firestore';
 import Timer from '../components/Timer';
@@ -99,23 +101,23 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         });
     } else {
       firestore()
-      .collection('rooms')
-      .doc(`${props.route.params[0]}`)
-      .update({
-        Users: firestore.FieldValue.arrayRemove({
-          name: props.route.params[1],
-          status: 'active'
-        }),
-      });
-    firestore()
-      .collection('rooms')
-      .doc(`${props.route.params[0]}`)
-      .update({
-        Users: firestore.FieldValue.arrayUnion({
-          name: props.route.params[1],
-          status: nextAppState,
-        }),
-      });
+        .collection('rooms')
+        .doc(`${props.route.params[0]}`)
+        .update({
+          Users: firestore.FieldValue.arrayRemove({
+            name: props.route.params[1],
+            status: 'active',
+          }),
+        });
+      firestore()
+        .collection('rooms')
+        .doc(`${props.route.params[0]}`)
+        .update({
+          Users: firestore.FieldValue.arrayUnion({
+            name: props.route.params[1],
+            status: nextAppState,
+          }),
+        });
     }
 
     appState.current = nextAppState;
@@ -129,9 +131,19 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         {users.map((user) => {
           return (
             <View
-              style={{alignItems: 'center', marginBottom: 10}}
+              style={{alignSelf: 'center', flexDirection:'row', marginBottom: 10}}
               key={user.name}>
-              <Text>{user.name} is {user.status == 'active' ? 'in the huddle' : 'not with the team'}</Text>
+              <Text>
+                {user.name} is{' '}
+                {user.status == 'active'
+                  ? 'in the huddle'
+                  : 'not with the team'}
+              </Text>
+              {user.status == 'active' ? (
+                <FontAwesomeIcon style={{marginLeft: 5, marginTop: 2}} icon={faCheck} color="green" size={14} />
+              ) : (
+                <FontAwesomeIcon style={{marginLeft: 5,  marginTop: 3}} icon={faTimes} color="red" size={14} />
+              )}
             </View>
           );
         })}
