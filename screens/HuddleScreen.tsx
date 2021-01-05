@@ -28,6 +28,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
   const [users, setUsers] = useState([{name: '', status: ''}]);
   const [session, setSession] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [notReadyMessage, setNotReadyMessage] = useState(false);
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
   useEffect(() => {
@@ -46,8 +47,6 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         const currentUsers = firebase['Users'];
         setUsers(currentUsers);
       });
-
-    // Stop listening for updates when no longer required
     return () => subscriber();
   }, []);
   useEffect(() => {
@@ -59,8 +58,6 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         const active = firebase['active'];
         setSession(active);
       });
-
-    // Stop listening for updates when no longer required
     return () => subscriber();
   }, []);
   useEffect(() => {
@@ -118,6 +115,11 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             status: nextAppState,
           }),
         });
+
+      firestore()
+        .collection('rooms')
+        .doc(`${props.route.params[0]}`)
+        .update({active: false});
     }
 
     appState.current = nextAppState;
@@ -131,7 +133,11 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         {users.map((user) => {
           return (
             <View
-              style={{alignSelf: 'center', flexDirection:'row', marginBottom: 10}}
+              style={{
+                alignSelf: 'center',
+                flexDirection: 'row',
+                marginBottom: 10,
+              }}
               key={user.name}>
               <Text>
                 {user.name} is{' '}
@@ -140,9 +146,19 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                   : 'not with the team'}
               </Text>
               {user.status == 'active' ? (
-                <FontAwesomeIcon style={{marginLeft: 5, marginTop: 2}} icon={faCheck} color="green" size={14} />
+                <FontAwesomeIcon
+                  style={{marginLeft: 5, marginTop: 2}}
+                  icon={faCheck}
+                  color="green"
+                  size={14}
+                />
               ) : (
-                <FontAwesomeIcon style={{marginLeft: 5,  marginTop: 3}} icon={faTimes} color="red" size={14} />
+                <FontAwesomeIcon
+                  style={{marginLeft: 5, marginTop: 3}}
+                  icon={faTimes}
+                  color="red"
+                  size={14}
+                />
               )}
             </View>
           );
@@ -151,8 +167,37 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         <View style={{alignItems: 'center', marginBottom: 15}}>
           <Timer session={session} room={props.route.params[0]} />
         </View>
-        <View></View>
         <View style={styles.buttonContainer}>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={notReadyMessage}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text>
+                  Please get everyone in the Huddle before starting session!
+                </Text>
+                <TouchableHighlight
+                  style={{
+                    marginTop: 5,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    paddingRight: 30,
+                    paddingLeft: 30,
+                    borderRadius: 5,
+                    backgroundColor: '#ffbe5c',
+                  }}
+                  onPress={() => {
+                    setNotReadyMessage(false);
+                  }}>
+                  <Text style={styles.textStyle}>Ok</Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+          </Modal>
           <Modal
             animationType="fade"
             transparent={true}
@@ -186,10 +231,21 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           <TouchableOpacity
             style={styles.playButton}
             onPress={() => {
-              firestore()
-                .collection('rooms')
-                .doc(`${props.route.params[0]}`)
-                .update({active: true});
+              const allUserStatusCheck = users.reduce(function (a, b) {
+                if (a.status && b.status == 'active') {
+                  return a;
+                } else {
+                  return {status: 'inactive'};
+                }
+              });
+              if (allUserStatusCheck.status == 'active') {
+                firestore()
+                  .collection('rooms')
+                  .doc(`${props.route.params[0]}`)
+                  .update({active: true});
+              } else {
+                setNotReadyMessage(true);
+              }
             }}>
             <Text style={{color: 'white', fontSize: 14}}>Start Session</Text>
             <FontAwesomeIcon icon={faPlay} color="white" size={14} />

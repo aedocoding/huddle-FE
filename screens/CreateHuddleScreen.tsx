@@ -12,6 +12,8 @@ import {
   Modal,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faHome} from '@fortawesome/free-solid-svg-icons';
 const CreateHuddleScreen = ({navigation}) => {
   const [room, setRoom] = useState('');
   const [username, setUsername] = useState('');
@@ -45,8 +47,8 @@ const CreateHuddleScreen = ({navigation}) => {
         <TouchableOpacity
           style={styles.createButton}
           onPress={() => {
-            const milliseconds = Date.now()
-            const date = new Date(milliseconds)
+            const milliseconds = Date.now();
+            const date = new Date(milliseconds);
             firestore()
               .collection('rooms')
               .doc(`${room}`)
@@ -55,13 +57,31 @@ const CreateHuddleScreen = ({navigation}) => {
                 Users: [],
                 Timestamp: date.toString(),
                 Duration: 900,
-                active: false
+                active: false,
               })
               .then(() => {
                 navigation.navigate('Huddle', [room, username]);
               });
           }}>
           <Text style={{color: 'white', fontSize: 15}}>Create Huddle</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.createButton}
+          onPress={() => {
+            navigation.navigate('Home');
+          }}>
+          <Text style={{color: 'white', fontSize: 15}}>
+            {' '}
+            <FontAwesomeIcon
+              style={{marginLeft: 5, marginTop: 3}}
+              icon={faHome}
+              color="white"
+              size={14}
+            />
+            Home
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
