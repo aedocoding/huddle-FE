@@ -130,6 +130,15 @@ const HuddleScreen = (props: any, {navigation}: any) => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView style={{marginTop: 50}}>
+        <View style={{alignItems: 'center', backgroundColor: 'white'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
+            Room Code: {props.route.params[0]}
+          </Text>
+          <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
+            Number of People: {users.length}
+          </Text>
+        </View>
+
         {users.map((user) => {
           return (
             <View
@@ -283,6 +292,10 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                     status: 'active',
                   }),
                 });
+              firestore()
+                .collection('rooms')
+                .doc(`${props.route.params[0]}`)
+                .update({active: false});
               props.navigation.navigate('Home');
             }}>
             <Text style={{color: 'white', fontSize: 14}}>Exit Huddle</Text>
