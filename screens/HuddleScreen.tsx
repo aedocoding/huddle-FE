@@ -25,7 +25,7 @@ import Timer from '../components/Timer';
 
 const HuddleScreen = (props: any, {navigation}: any) => {
   const [timer, setTimer] = useState('15');
-  const [users, setUsers] = useState([{name: '', status: '', permissions: ''}]);
+  const [users, setUsers] = useState([{name: '', status: '', permissions: '', id: 0}]);
   const [session, setSession] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [notReadyMessage, setNotReadyMessage] = useState(false);
@@ -59,28 +59,6 @@ const HuddleScreen = (props: any, {navigation}: any) => {
       });
     return () => roomListener();
   }, [closeRoom]);
-  // useEffect(() => {
-  //   const timerListener = firestore()
-  //     .collection('rooms')
-  //     .doc(`${props.route.params[0]}`)
-  //     .onSnapshot((documentSnapshot) => {
-  //       const firebase = documentSnapshot.data();
-  //       const active = firebase['active'];
-  //       setSession(active);
-  //     });
-  //   return () => timerListener();
-  // }, []);
-  // useEffect(() => {
-  //   const closeRoomListener = firestore()
-  //     .collection('rooms')
-  //     .doc(`${props.route.params[0]}`)
-  //     .onSnapshot((documentSnapshot) => {
-  //       const firebase = documentSnapshot.data();
-  //       const closed = firebase['closed'];
-  //       setCloseRoom(closed);
-  //     });
-  //   return () => closeRoomListener();
-  // }, []);
   useEffect(() => {
     const myUsername = props.route.params[1];
     firestore()
@@ -91,6 +69,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           name: myUsername,
           status: appStateVisible,
           permissions: props.route.params[2],
+          id: props.route.params[3],
         }),
       });
   }, []);
@@ -195,7 +174,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                 marginBottom: 10,
                 marginRight: 50,
               }}
-              key={user.name}>
+              key={props.route.params[3]}>
               <Text>
                 {user.name} is{' '}
                 {user.status == 'active'
@@ -388,6 +367,8 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                   Users: firestore.FieldValue.arrayRemove({
                     name: props.route.params[1],
                     status: 'active',
+                    permissions: 'participant',
+                    id: props.route.params[3],
                   }),
                 });
               firestore()

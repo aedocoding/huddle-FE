@@ -60,7 +60,7 @@ const CreateHuddleScreen = ({navigation}) => {
                 active: false,
               })
               .then(() => {
-                navigation.navigate('Huddle', [room, username, 'host']);
+                navigation.navigate('Huddle', [room, username, 'host', Math.floor(Math.random() * 100)]);
               });
           }}>
           <Text style={{color: 'white', fontSize: 15}}>Create Huddle</Text>

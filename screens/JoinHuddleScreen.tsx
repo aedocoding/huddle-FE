@@ -51,7 +51,7 @@ const JoinHuddleScreen = ({navigation}) => {
           <TouchableOpacity
             style={styles.joinButton}
             onPress={() => {
-              navigation.navigate('Huddle', [invite, username, 'participant']);
+              navigation.navigate('Huddle', [invite, username, 'participant', Math.floor(Math.random() * 100)]);
             }}>
             <Text style={{color: 'white', fontSize: 15}}>Join Huddle</Text>
           </TouchableOpacity>
