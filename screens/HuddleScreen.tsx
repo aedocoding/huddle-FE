@@ -116,6 +116,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             name: props.route.params[1],
             status: 'background',
             permissions: props.route.params[2],
+            id: props.route.params[3]
           }),
         });
       firestore()
@@ -126,6 +127,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             name: props.route.params[1],
             status: nextAppState,
             permissions: props.route.params[2],
+            id: props.route.params[3]
           }),
         });
     } else {
@@ -137,6 +139,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             name: props.route.params[1],
             status: 'active',
             permissions: props.route.params[2],
+            id: props.route.params[3]
           }),
         });
       firestore()
@@ -147,6 +150,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             name: props.route.params[1],
             status: nextAppState,
             permissions: props.route.params[2],
+            id: props.route.params[3]
           }),
         });
 
