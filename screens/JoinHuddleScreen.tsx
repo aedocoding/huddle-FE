@@ -63,7 +63,7 @@ const JoinHuddleScreen = ({navigation}) => {
                       invite,
                       username,
                       'participant',
-                      Math.floor(Math.random() * 100),
+                      Math.floor(Math.random() * 1000),
                     ]);
                   } else {
                     setModalMessage(true);

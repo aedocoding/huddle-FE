@@ -6,8 +6,6 @@ import {
   ScrollView,
   View,
   Text,
-  StatusBar,
-  Image,
   TouchableOpacity,
   TouchableHighlight,
   TextInput,
@@ -191,10 +189,11 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           return (
             <View
               style={{
-                alignSelf: 'flex-start',
+                alignSelf: 'flex-end',
                 flexDirection: 'row',
                 marginBottom: 5,
                 marginLeft: 10,
+                marginRight: 135
               }}
               key={props.route.params[3]}>
               <Text style={{fontWeight: 'bold'}}>{user.name}</Text>
