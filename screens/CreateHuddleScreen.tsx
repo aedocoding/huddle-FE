@@ -60,7 +60,7 @@ const CreateHuddleScreen = ({navigation}) => {
                 active: false,
               })
               .then(() => {
-                navigation.navigate('Huddle', [room, username]);
+                navigation.navigate('Huddle', [room, username, 'host']);
               });
           }}>
           <Text style={{color: 'white', fontSize: 15}}>Create Huddle</Text>
@@ -102,8 +102,8 @@ const styles = StyleSheet.create({
   nameHuddle: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginBottom: 10,
-    paddingBottom: 10,
+    marginBottom: 5,
+    paddingBottom: 5,
     backgroundColor: 'white',
     width: '100%',
   },

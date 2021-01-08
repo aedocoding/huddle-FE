@@ -25,10 +25,12 @@ import Timer from '../components/Timer';
 
 const HuddleScreen = (props: any, {navigation}: any) => {
   const [timer, setTimer] = useState('15');
-  const [users, setUsers] = useState([{name: '', status: ''}]);
+  const [users, setUsers] = useState([{name: '', status: '', permissions: ''}]);
   const [session, setSession] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [notReadyMessage, setNotReadyMessage] = useState(false);
+  const [closeRoomMessage, setCloseRoomMessage] = useState(false);
+  const [closeRoom, setCloseRoom] = useState(false);
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
   useEffect(() => {
@@ -38,28 +40,44 @@ const HuddleScreen = (props: any, {navigation}: any) => {
       AppState.removeEventListener('change', _handleAppStateChange);
     };
   }, []);
+
   useEffect(() => {
-    const subscriber = firestore()
+    const roomListener = firestore()
       .collection('rooms')
       .doc(`${props.route.params[0]}`)
       .onSnapshot((documentSnapshot) => {
         const firebase = documentSnapshot.data();
         const currentUsers = firebase['Users'];
+        const active = firebase['active'];
+        const closed = firebase['closed'];
+        setSession(active);
+        setCloseRoom(closed);
         setUsers(currentUsers);
       });
-    return () => subscriber();
+    return () => roomListener();
   }, []);
-  useEffect(() => {
-    const subscriber = firestore()
-      .collection('rooms')
-      .doc(`${props.route.params[0]}`)
-      .onSnapshot((documentSnapshot) => {
-        const firebase = documentSnapshot.data();
-        const active = firebase['active'];
-        setSession(active);
-      });
-    return () => subscriber();
-  }, []);
+  // useEffect(() => {
+  //   const timerListener = firestore()
+  //     .collection('rooms')
+  //     .doc(`${props.route.params[0]}`)
+  //     .onSnapshot((documentSnapshot) => {
+  //       const firebase = documentSnapshot.data();
+  //       const active = firebase['active'];
+  //       setSession(active);
+  //     });
+  //   return () => timerListener();
+  // }, []);
+  // useEffect(() => {
+  //   const closeRoomListener = firestore()
+  //     .collection('rooms')
+  //     .doc(`${props.route.params[0]}`)
+  //     .onSnapshot((documentSnapshot) => {
+  //       const firebase = documentSnapshot.data();
+  //       const closed = firebase['closed'];
+  //       setCloseRoom(closed);
+  //     });
+  //   return () => closeRoomListener();
+  // }, []);
   useEffect(() => {
     const myUsername = props.route.params[1];
     firestore()
@@ -69,10 +87,28 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         Users: firestore.FieldValue.arrayUnion({
           name: myUsername,
           status: appStateVisible,
+          permissions: props.route.params[2],
         }),
       });
   }, []);
 
+  useEffect(() => {
+    const checkPermissions = users.filter((user) => {
+      return user.name == props.route.params[1];
+    });
+    if (closeRoom == true) {
+      props.navigation.navigate('Home');
+      if (checkPermissions[0]['permissions'] == 'host') {
+        firestore()
+          .collection('rooms')
+          .doc(`${props.route.params[0]}`)
+          .delete()
+          .then(() => {
+            console.log(`${props.route.params[0]} was deleted`);
+          });
+      }
+    }
+  }, [closeRoom]);
   const _handleAppStateChange = (nextAppState) => {
     if (
       appState.current.match(/inactive|background/) &&
@@ -85,6 +121,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           Users: firestore.FieldValue.arrayRemove({
             name: props.route.params[1],
             status: 'background',
+            permissions: props.route.params[2],
           }),
         });
       firestore()
@@ -94,6 +131,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           Users: firestore.FieldValue.arrayUnion({
             name: props.route.params[1],
             status: nextAppState,
+            permissions: props.route.params[2],
           }),
         });
     } else {
@@ -104,6 +142,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           Users: firestore.FieldValue.arrayRemove({
             name: props.route.params[1],
             status: 'active',
+            permissions: props.route.params[2],
           }),
         });
       firestore()
@@ -113,6 +152,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           Users: firestore.FieldValue.arrayUnion({
             name: props.route.params[1],
             status: nextAppState,
+            permissions: props.route.params[2],
           }),
         });
 
@@ -128,24 +168,29 @@ const HuddleScreen = (props: any, {navigation}: any) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <ScrollView style={{marginTop: 50}}>
-        <View style={{alignItems: 'center', backgroundColor: 'white'}}>
-          <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
-            Room Code: {props.route.params[0]}
-          </Text>
-          <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
-            Number of People: {users.length}
-          </Text>
-        </View>
-
+    <SafeAreaView style={{}}>
+      <View
+        style={{
+          alignItems: 'center',
+          backgroundColor: 'white',
+          marginBottom: 10,
+        }}>
+        <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
+          Room Code: {props.route.params[0]}
+        </Text>
+        <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
+          Number of People: {users.length}
+        </Text>
+      </View>
+      <ScrollView persistentScrollbar={true} style={{height: 250}}>
         {users.map((user) => {
           return (
             <View
               style={{
-                alignSelf: 'center',
+                alignSelf: 'flex-end',
                 flexDirection: 'row',
                 marginBottom: 10,
+                marginRight: 50,
               }}
               key={user.name}>
               <Text>
@@ -172,117 +217,167 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             </View>
           );
         })}
-
-        <View style={{alignItems: 'center', marginBottom: 15}}>
-          <Timer session={session} room={props.route.params[0]} />
-        </View>
-        <View style={styles.buttonContainer}>
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={notReadyMessage}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <Text>
-                  Please get everyone in the Huddle before starting session!
-                </Text>
-                <TouchableHighlight
-                  style={{
-                    marginTop: 5,
-                    paddingTop: 10,
-                    paddingBottom: 10,
-                    paddingRight: 30,
-                    paddingLeft: 30,
-                    borderRadius: 5,
-                    backgroundColor: '#ffbe5c',
-                  }}
-                  onPress={() => {
-                    setNotReadyMessage(false);
-                  }}>
-                  <Text style={styles.textStyle}>Ok</Text>
-                </TouchableHighlight>
-              </View>
+      </ScrollView>
+      <View style={{alignItems: 'center', marginBottom: 15}}>
+        <Timer session={session} room={props.route.params[0]} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={notReadyMessage}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text>
+                Please get everyone in the Huddle before starting session!
+              </Text>
+              <TouchableHighlight
+                style={{
+                  marginTop: 5,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  paddingRight: 30,
+                  paddingLeft: 30,
+                  borderRadius: 5,
+                  backgroundColor: '#ffbe5c',
+                }}
+                onPress={() => {
+                  setNotReadyMessage(false);
+                }}>
+                <Text style={styles.textStyle}>Ok</Text>
+              </TouchableHighlight>
             </View>
-          </Modal>
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <TextInput
-                  style={styles.modalText}
-                  value={timer}
-                  onChangeText={(startTime) => {
-                    setTimer(startTime);
-                  }}></TextInput>
+          </View>
+        </Modal>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {}}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <TextInput
+                style={styles.modalText}
+                value={timer}
+                onChangeText={(startTime) => {
+                  setTimer(startTime);
+                }}></TextInput>
 
-                <TouchableHighlight
-                  style={{...styles.openButton, backgroundColor: '#ffbe5c'}}
-                  onPress={() => {
-                    setModalVisible(!modalVisible);
-                    firestore()
-                      .collection('rooms')
-                      .doc(`${props.route.params[0]}`)
-                      .update({Duration: parseInt(timer) * 60});
-                  }}>
-                  <Text style={styles.textStyle}>Set Timer</Text>
-                </TouchableHighlight>
-              </View>
+              <TouchableHighlight
+                style={{...styles.openButton, backgroundColor: '#ffbe5c'}}
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                  firestore()
+                    .collection('rooms')
+                    .doc(`${props.route.params[0]}`)
+                    .update({Duration: parseInt(timer) * 60});
+                }}>
+                <Text style={styles.textStyle}>Set Timer</Text>
+              </TouchableHighlight>
             </View>
-          </Modal>
-          <TouchableOpacity
-            style={styles.playButton}
-            onPress={() => {
-              const allUserStatusCheck = users.reduce(function (a, b) {
-                if (a.status && b.status == 'active') {
-                  return a;
-                } else {
-                  return {status: 'inactive'};
-                }
-              });
-              if (allUserStatusCheck.status == 'active') {
-                firestore()
-                  .collection('rooms')
-                  .doc(`${props.route.params[0]}`)
-                  .update({active: true});
+          </View>
+        </Modal>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={closeRoomMessage}
+          onRequestClose={() => {}}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text>
+                You are the host, if you leave, the whole room will be closed,
+                are you sure you want to leave?
+              </Text>
+              <TouchableHighlight
+                style={{
+                  marginTop: 5,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  paddingRight: 30,
+                  paddingLeft: 30,
+                  borderRadius: 5,
+                  backgroundColor: '#ffbe5c',
+                }}
+                onPress={() => {
+                  setCloseRoomMessage(false);
+                  firestore()
+                    .collection('rooms')
+                    .doc(`${props.route.params[0]}`)
+                    .update({closed: true});
+                }}>
+                <Text style={styles.textStyle}>Confirm</Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={{
+                  marginTop: 5,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  paddingRight: 30,
+                  paddingLeft: 30,
+                  borderRadius: 5,
+                  backgroundColor: '#ffbe5c',
+                }}
+                onPress={() => {
+                  setCloseRoomMessage(false);
+                }}>
+                <Text style={styles.textStyle}>Cancel</Text>
+              </TouchableHighlight>
+            </View>
+          </View>
+        </Modal>
+        <TouchableOpacity
+          style={styles.playButton}
+          onPress={() => {
+            const allUserStatusCheck = users.reduce(function (a, b) {
+              if (a.status && b.status == 'active') {
+                return a;
               } else {
-                setNotReadyMessage(true);
+                return {status: 'inactive'};
               }
-            }}>
-            <Text style={{color: 'white', fontSize: 14}}>Start Session</Text>
-            <FontAwesomeIcon icon={faPlay} color="white" size={14} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.playButton}
-            onPress={() => {
+            });
+            if (allUserStatusCheck.status == 'active') {
               firestore()
                 .collection('rooms')
                 .doc(`${props.route.params[0]}`)
-                .update({active: false});
-            }}>
-            <Text style={{color: 'white', fontSize: 14}}>Stop Session</Text>
-            <FontAwesomeIcon icon={faStop} color="white" size={14} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.playButton}
-            onPress={() => {
-              setModalVisible(true);
-            }}>
-            <Text style={{color: 'white', fontSize: 14}}>Set Timer</Text>
-            <FontAwesomeIcon icon={faClock} color="white" size={14} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.playButton}
-            onPress={() => {
+                .update({active: true});
+            } else {
+              setNotReadyMessage(true);
+            }
+          }}>
+          <Text style={{color: 'white', fontSize: 14}}>Start Session</Text>
+          <FontAwesomeIcon icon={faPlay} color="white" size={14} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.playButton}
+          onPress={() => {
+            firestore()
+              .collection('rooms')
+              .doc(`${props.route.params[0]}`)
+              .update({active: false});
+          }}>
+          <Text style={{color: 'white', fontSize: 14}}>Stop Session</Text>
+          <FontAwesomeIcon icon={faStop} color="white" size={14} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.playButton}
+          onPress={() => {
+            setModalVisible(true);
+          }}>
+          <Text style={{color: 'white', fontSize: 14}}>Set Timer</Text>
+          <FontAwesomeIcon icon={faClock} color="white" size={14} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.playButton}
+          onPress={() => {
+            const checkPermissions = users.filter((user) => {
+              return user.name == props.route.params[1];
+            });
+            if (checkPermissions[0]['permissions'] == 'participant') {
               firestore()
                 .collection('rooms')
                 .doc(`${props.route.params[0]}`)
@@ -297,12 +392,14 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                 .doc(`${props.route.params[0]}`)
                 .update({active: false});
               props.navigation.navigate('Home');
-            }}>
-            <Text style={{color: 'white', fontSize: 14}}>Exit Huddle</Text>
-            <FontAwesomeIcon icon={faSignOutAlt} color="white" size={14} />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            } else {
+              setCloseRoomMessage(true);
+            }
+          }}>
+          <Text style={{color: 'white', fontSize: 14}}>Exit Huddle</Text>
+          <FontAwesomeIcon icon={faSignOutAlt} color="white" size={14} />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };

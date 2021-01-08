@@ -23,23 +23,37 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {connect} from 'react-redux';
-import HomeScreen from './screens/HomeScreen'
-import CreateHuddleScreen from './screens/CreateHuddleScreen'
-import JoinHuddleScreen from './screens/JoinHuddleScreen'
-import HuddleScreen from './screens/HuddleScreen'
-
-
+import HomeScreen from './screens/HomeScreen';
+import CreateHuddleScreen from './screens/CreateHuddleScreen';
+import JoinHuddleScreen from './screens/JoinHuddleScreen';
+import HuddleScreen from './screens/HuddleScreen';
 
 const Stack = createStackNavigator();
 const App: () => React.ReactNode = () => {
   return (
     <>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName={"Home"}>
-          <Stack.Screen name="Home" component={HomeScreen}  options={{ title: '' }}/>
-          <Stack.Screen name="Create Huddle" component={CreateHuddleScreen}  options={{ title: '' }} />
-          <Stack.Screen name="Join Huddle" component={JoinHuddleScreen}  options={{ title: '' }} />
-          <Stack.Screen name="Huddle" component={HuddleScreen}  options={{ title: '' }} />
+        <Stack.Navigator initialRouteName={'Home'}>
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen
+            name="Create Huddle"
+            component={CreateHuddleScreen}
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen
+            name="Join Huddle"
+            component={JoinHuddleScreen}
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen
+            name="Huddle"
+            component={HuddleScreen}
+            options={{ headerShown: false }} 
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </>

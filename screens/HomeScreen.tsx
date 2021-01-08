@@ -5,15 +5,26 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Image
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCoffee} from '@fortawesome/free-solid-svg-icons';
 import {faUsers} from '@fortawesome/free-solid-svg-icons';
+const logo = require("../logo.png")
 
 const HomeScreen = ({navigation}) => {
   return (
     <SafeAreaView>
+          <View  style={{alignItems:'center', marginTop: 40}}>
+      <Image
+        style={{height: 141, width: 150}}
+        source={logo}
+      />
+      </View>
+      <View style={{alignItems:'center', marginTop: 40}}>
+        <Text style={{color:'#ffbe5c', fontWeight: 'bold', fontSize: 25}}>H U D D L E</Text>
+      </View>
       <View style={styles.homeScreen}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.createButton} onPress={() => {navigation.navigate('Create Huddle')}}>
@@ -61,7 +72,7 @@ const styles = StyleSheet.create({
     },
     homeScreen: {
       backgroundColor: Colors.gray,
-      paddingTop: 150,
+      paddingTop: 50,
     },
   
     body: {

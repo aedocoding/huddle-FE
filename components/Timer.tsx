@@ -7,8 +7,7 @@ const Timer = (props: any) => {
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
-    console.log(props);
-    const subscriber = firestore()
+    const durationListener = firestore()
       .collection('rooms')
       .doc(`${props.room}`)
       .onSnapshot((documentSnapshot) => {
@@ -18,37 +17,30 @@ const Timer = (props: any) => {
         setMinutes(Math.floor(start / 60));
         setSeconds(start % 60);
       });
-
-    // Stop listening for updates when no longer required
-    return () => subscriber();
+    return () => durationListener();
   }, []);
-//     useEffect(() => {
-//     firestore()
-//       .collection('rooms')
-//       .doc(`${props.room}`)
-//       .update({Duration: duration});
-//   }, []);
+
   useEffect(() => {
     let myInterval = setInterval(() => {
       if (props.session == true) {
         if (seconds > 0) {
           setSeconds(seconds - 1);
           firestore()
-          .collection('rooms')
-          .doc(`${props.room}`)
-          .update({Duration: duration - 1});
+            .collection('rooms')
+            .doc(`${props.room}`)
+            .update({Duration: duration - 1});
         }
       }
       if (seconds === 0 && props.session == true) {
-        if (minutes === 0 && props.session == true) {   
+        if (minutes === 0 && props.session == true) {
           clearInterval(myInterval);
         } else {
           setMinutes(minutes - 1);
           setSeconds(59);
           firestore()
-          .collection('rooms')
-          .doc(`${props.room}`)
-          .update({Duration: duration - 1});
+            .collection('rooms')
+            .doc(`${props.room}`)
+            .update({Duration: duration - 1});
         }
       }
     }, 1000);
@@ -58,9 +50,10 @@ const Timer = (props: any) => {
   });
 
   return (
-    <View style={{backgroundColor:'white', width: '100%', alignItems:'center'}}>
+    <View
+      style={{backgroundColor: 'white', width: '100%', alignItems: 'center'}}>
       {minutes === 0 && seconds === 0 ? null : (
-        <Text style={{fontWeight: 'bold', fontSize: 50, color:'#ffbe5c'}}>
+        <Text style={{fontWeight: 'bold', fontSize: 50, color: '#ffbe5c'}}>
           {' '}
           {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
         </Text>

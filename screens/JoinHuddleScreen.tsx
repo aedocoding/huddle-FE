@@ -39,7 +39,7 @@ const JoinHuddleScreen = ({navigation}) => {
           <Text>Your name</Text>
           <View style={styles.centerInput}>
             <TextInput
-              placeholder={'Enter your name here'}
+              placeholder={'Name'}
               value={username}
               onChangeText={(name: string) => {
                 setUsername(name);
@@ -51,7 +51,7 @@ const JoinHuddleScreen = ({navigation}) => {
           <TouchableOpacity
             style={styles.joinButton}
             onPress={() => {
-              navigation.navigate('Huddle', [invite, username]);
+              navigation.navigate('Huddle', [invite, username, 'participant']);
             }}>
             <Text style={{color: 'white', fontSize: 15}}>Join Huddle</Text>
           </TouchableOpacity>
