@@ -27,6 +27,7 @@ const JoinHuddleScreen = ({navigation}) => {
           <Text>Invite Code</Text>
           <View style={styles.centerInput}>
             <TextInput
+            style={{width: '100%'}}
               placeholder={'#12345'}
               value={invite}
               onChangeText={(inviteCode: string) => {
@@ -39,6 +40,7 @@ const JoinHuddleScreen = ({navigation}) => {
           <Text>Your name</Text>
           <View style={styles.centerInput}>
             <TextInput
+            style={{width: '100%'}}
               placeholder={'Name'}
               value={username}
               onChangeText={(name: string) => {

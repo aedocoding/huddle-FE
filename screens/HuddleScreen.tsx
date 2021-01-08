@@ -14,22 +14,31 @@ import {
   Modal,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faUsers} from '@fortawesome/free-solid-svg-icons';
 import {faPlay} from '@fortawesome/free-solid-svg-icons';
 import {faStop} from '@fortawesome/free-solid-svg-icons';
 import {faClock} from '@fortawesome/free-solid-svg-icons';
 import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
+import {faCommentDots} from '@fortawesome/free-solid-svg-icons';
+import {faArrowRight} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 import firestore from '@react-native-firebase/firestore';
 import Timer from '../components/Timer';
 
 const HuddleScreen = (props: any, {navigation}: any) => {
   const [timer, setTimer] = useState('15');
-  const [users, setUsers] = useState([{name: '', status: '', permissions: '', id: 0}]);
+  const [users, setUsers] = useState([
+    {name: '', status: '', permissions: '', id: 0},
+  ]);
   const [session, setSession] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [notReadyMessage, setNotReadyMessage] = useState(false);
   const [closeRoomMessage, setCloseRoomMessage] = useState(false);
+  const [messageState, setMessageState] = useState('');
+  const [huddleMessages, setHuddleMessages] = useState([
+    {message: '', timestamp: 0},
+  ]);
   const [closeRoom, setCloseRoom] = useState(false);
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
@@ -55,6 +64,9 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         }
         if (documentSnapshot.exists) {
           setUsers(firebase['Users']);
+        }
+        if (documentSnapshot.exists) {
+          setHuddleMessages(firebase['messages']);
         }
       });
     return () => roomListener();
@@ -91,7 +103,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
       }
     }
   }, [closeRoom]);
-  const _handleAppStateChange = (nextAppState) => {
+  const _handleAppStateChange = (nextAppState: string) => {
     if (
       appState.current.match(/inactive|background/) &&
       nextAppState === 'active'
@@ -146,40 +158,47 @@ const HuddleScreen = (props: any, {navigation}: any) => {
 
     appState.current = nextAppState;
     setAppStateVisible(appState.current);
-    console.log('AppState', appState.current);
   };
 
   return (
     <SafeAreaView style={{}}>
       <View
         style={{
-          alignItems: 'center',
+          alignItems: 'flex-start',
           backgroundColor: 'white',
+          marginTop: 20,
           marginBottom: 10,
+          paddingLeft: 10,
         }}>
-        <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
-          Room Code: {props.route.params[0]}
-        </Text>
-        <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
-          Number of People: {users.length}
-        </Text>
+        <View style={{flexDirection: 'row'}}>
+          <FontAwesomeIcon
+            style={{marginLeft: 5, marginTop: 6, marginRight: 5}}
+            icon={faUsers}
+            color="#ffbe5c"
+            size={20}
+          />
+          <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
+            ∙ {props.route.params[0]} ∙ {users.length}
+          </Text>
+        </View>
       </View>
-      <ScrollView persistentScrollbar={true} style={{height: 250}}>
+      <ScrollView persistentScrollbar={true} style={{height: 150}}>
         {users.map((user) => {
           return (
             <View
               style={{
-                alignSelf: 'flex-end',
+                alignSelf: 'flex-start',
                 flexDirection: 'row',
                 marginBottom: 10,
-                marginRight: 50,
+                marginLeft: 10,
               }}
               key={props.route.params[3]}>
+              <Text style={{fontWeight: 'bold'}}>{user.name}</Text>
               <Text>
-                {user.name} is{' '}
+          
                 {user.status == 'active'
-                  ? 'in the huddle'
-                  : 'not with the team'}
+                  ? ' is in the huddle'
+                  : ' is not with the team'}
               </Text>
               {user.status == 'active' ? (
                 <FontAwesomeIcon
@@ -200,17 +219,73 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           );
         })}
       </ScrollView>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignContent: 'center',
+          backgroundColor: 'white',
+          marginBottom: 5,
+          paddingLeft: 10,
+        }}>
+        <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
+          Chat
+        </Text>
+        <FontAwesomeIcon
+          style={{marginLeft: 5, marginTop: 2}}
+          icon={faCommentDots}
+          color="#ffbe5c"
+          size={14}
+        />
+      </View>
+      <ScrollView persistentScrollbar={true} style={{height: 150}}>
+        {huddleMessages.map((messageData) => {
+          return (
+            <View style={{paddingLeft: 10}}>
+              <Text>{messageData['message']}</Text>
+            </View>
+          );
+        })}
+      </ScrollView>
       <View style={{alignItems: 'center', marginBottom: 15}}>
         <Timer session={session} room={props.route.params[0]} />
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignContent: 'space-between',
+          backgroundColor: 'white',
+        }}>
+        <TextInput
+          value={messageState}
+          placeholder={'Send a message'}
+          style={{width: '92.5%', paddingLeft: 10}}
+          onChangeText={(message: string) => {
+            setMessageState(message);
+          }}
+          onSubmitEditing={() => {
+            firestore()
+              .collection('rooms')
+              .doc(`${props.route.params[0]}`)
+              .update({
+                messages: firestore.FieldValue.arrayUnion({
+                  message: `${props.route.params[1]}: ${messageState}`,
+                  timestamp: Date.now(),
+                }),
+              });
+            setMessageState('');
+          }}
+        />
+        <TouchableOpacity style={{paddingTop: 18}}>
+          <FontAwesomeIcon icon={faArrowRight} color="#ffbe5c" size={14} />
+        </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
         <Modal
           animationType="fade"
           transparent={true}
           visible={notReadyMessage}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-          }}>
+          onRequestClose={() => {}}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text>
@@ -270,8 +345,8 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text>
-                You are the host, if you leave, the whole room will be closed,
-                are you sure you want to leave?
+                You are the host, if you leave, the room will be closed, are you
+                sure you want to leave?
               </Text>
               <TouchableHighlight
                 style={{
@@ -357,7 +432,12 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           style={styles.playButton}
           onPress={() => {
             const checkPermissions = users.filter((user) => {
-              return user.name == props.route.params[1];
+              if (
+                user.name == props.route.params[1] &&
+                user.id == props.route.params[3]
+              ) {
+                return user;
+              }
             });
             if (checkPermissions[0]['permissions'] == 'participant') {
               firestore()

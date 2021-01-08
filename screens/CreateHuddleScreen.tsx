@@ -19,22 +19,26 @@ const CreateHuddleScreen = ({navigation}) => {
   const [username, setUsername] = useState('');
   return (
     <SafeAreaView>
-      <View style={{marginTop: 150, marginBottom: 10, marginLeft: 5}}>
-        <Text>Your Huddle</Text>
-      </View>
-      <View style={styles.nameHuddle}>
-        <TextInput
-          placeholder={'Name your Huddle'}
-          value={room}
-          onChangeText={(roomCode: string) => {
-            setRoom(roomCode);
-            console.log(room);
-          }}></TextInput>
-      </View>
+      <View style={{marginTop: 150, marginBottom: 10, marginLeft: 5}}></View>
       <View style={{padding: 5}}>
-        <Text>Your name</Text>
+        <Text>Your Huddle</Text>
+
         <View style={styles.centerInput}>
           <TextInput
+            style={{width: '100%'}}
+            placeholder={'Name your Huddle'}
+            value={room}
+            onChangeText={(roomCode: string) => {
+              setRoom(roomCode);
+              console.log(room);
+            }}></TextInput>
+        </View>
+      </View>
+      <View style={{padding: 5}}>
+        <Text>Your Name</Text>
+        <View style={styles.centerInput}>
+          <TextInput
+            style={{width: '100%'}}
             placeholder={'Enter your name here'}
             value={username}
             onChangeText={(name: string) => {
@@ -58,9 +62,15 @@ const CreateHuddleScreen = ({navigation}) => {
                 Timestamp: date.toString(),
                 Duration: 900,
                 active: false,
+                messages: []
               })
               .then(() => {
-                navigation.navigate('Huddle', [room, username, 'host', Math.floor(Math.random() * 100)]);
+                navigation.navigate('Huddle', [
+                  room,
+                  username,
+                  'host',
+                  Math.floor(Math.random() * 100),
+                ]);
               });
           }}>
           <Text style={{color: 'white', fontSize: 15}}>Create Huddle</Text>
