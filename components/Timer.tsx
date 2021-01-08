@@ -12,10 +12,15 @@ const Timer = (props: any) => {
       .doc(`${props.room}`)
       .onSnapshot((documentSnapshot) => {
         const firebase = documentSnapshot.data();
-        const start = firebase['Duration'];
-        setDuration(start);
-        setMinutes(Math.floor(start / 60));
-        setSeconds(start % 60);
+        if (documentSnapshot.exists) {
+          setDuration(firebase['Duration']);
+        }
+        if (documentSnapshot.exists) {
+          setMinutes(Math.floor(firebase['Duration'] / 60));
+        }
+        if (documentSnapshot.exists) {
+          setSeconds(firebase['Duration'] % 60);
+        }
       });
     return () => durationListener();
   }, []);

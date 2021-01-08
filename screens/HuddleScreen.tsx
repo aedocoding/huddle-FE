@@ -47,15 +47,18 @@ const HuddleScreen = (props: any, {navigation}: any) => {
       .doc(`${props.route.params[0]}`)
       .onSnapshot((documentSnapshot) => {
         const firebase = documentSnapshot.data();
-        const currentUsers = firebase['Users'];
-        const active = firebase['active'];
-        const closed = firebase['closed'];
-        setSession(active);
-        setCloseRoom(closed);
-        setUsers(currentUsers);
+        if (documentSnapshot.exists) {
+          setSession(firebase['active']);
+        }
+        if (documentSnapshot.exists) {
+          setCloseRoom(firebase['closed']);
+        }
+        if (documentSnapshot.exists) {
+          setUsers(firebase['Users']);
+        }
       });
     return () => roomListener();
-  }, []);
+  }, [closeRoom]);
   // useEffect(() => {
   //   const timerListener = firestore()
   //     .collection('rooms')
