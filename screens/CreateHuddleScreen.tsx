@@ -2,11 +2,8 @@ import React, {useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
   Text,
-  StatusBar,
-  Image,
   TouchableOpacity,
   TextInput,
   Modal,
@@ -17,6 +14,7 @@ import {faHome} from '@fortawesome/free-solid-svg-icons';
 const CreateHuddleScreen = ({navigation}) => {
   const [room, setRoom] = useState('');
   const [username, setUsername] = useState('');
+  const [modalMessage, setModalMessage] = useState(false);
   return (
     <SafeAreaView>
       <View style={{marginTop: 150, marginBottom: 10, marginLeft: 5}}></View>
@@ -47,6 +45,37 @@ const CreateHuddleScreen = ({navigation}) => {
             }}></TextInput>
         </View>
       </View>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalMessage}
+        onRequestClose={() => {}}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text>
+            Please choose a different name for your huddle, that one is already taken!
+            </Text>
+            <View style={{flexDirection: 'row', marginTop: 10}}>
+              <TouchableOpacity
+                style={{
+                  marginTop: 5,
+                  marginRight: 30,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  paddingRight: 30,
+                  paddingLeft: 30,
+                  borderRadius: 5,
+                  backgroundColor: '#ffbe5c',
+                }}
+                onPress={() => {
+                  setModalMessage(false);
+                }}>
+                <Text style={styles.textStyle}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.createButton}
@@ -56,21 +85,31 @@ const CreateHuddleScreen = ({navigation}) => {
             firestore()
               .collection('rooms')
               .doc(`${room}`)
-              .set({
-                Id: room,
-                Users: [],
-                Timestamp: date.toString(),
-                Duration: 900,
-                active: false,
-                messages: []
-              })
-              .then(() => {
-                navigation.navigate('Huddle', [
-                  room,
-                  username,
-                  'host',
-                  Math.floor(Math.random() * 100),
-                ]);
+              .get()
+              .then((documentSnapshot) => {
+                if (documentSnapshot.exists) {
+                  setModalMessage(true);
+                } else {
+                  firestore()
+                    .collection('rooms')
+                    .doc(`${room}`)
+                    .set({
+                      Id: room,
+                      Users: [],
+                      Timestamp: date.toString(),
+                      Duration: 900,
+                      active: false,
+                      messages: [],
+                    })
+                    .then(() => {
+                      navigation.navigate('Huddle', [
+                        room,
+                        username,
+                        'host',
+                        Math.floor(Math.random() * 100),
+                      ]);
+                    });
+                }
               });
           }}>
           <Text style={{color: 'white', fontSize: 15}}>Create Huddle</Text>
@@ -117,6 +156,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     width: '100%',
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   createButton: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -127,6 +186,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#ffbe5c',
     borderColor: '#ffbe5c',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 export default CreateHuddleScreen;
