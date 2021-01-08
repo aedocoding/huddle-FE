@@ -37,7 +37,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
   const [closeRoomMessage, setCloseRoomMessage] = useState(false);
   const [messageState, setMessageState] = useState('');
   const [huddleMessages, setHuddleMessages] = useState([
-    {message: '', timestamp: 0},
+    {name: '', message: '', timestamp: 0},
   ]);
   const [closeRoom, setCloseRoom] = useState(false);
   const appState = useRef(AppState.currentState);
@@ -116,7 +116,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             name: props.route.params[1],
             status: 'background',
             permissions: props.route.params[2],
-            id: props.route.params[3]
+            id: props.route.params[3],
           }),
         });
       firestore()
@@ -127,7 +127,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             name: props.route.params[1],
             status: nextAppState,
             permissions: props.route.params[2],
-            id: props.route.params[3]
+            id: props.route.params[3],
           }),
         });
     } else {
@@ -139,7 +139,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             name: props.route.params[1],
             status: 'active',
             permissions: props.route.params[2],
-            id: props.route.params[3]
+            id: props.route.params[3],
           }),
         });
       firestore()
@@ -150,7 +150,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             name: props.route.params[1],
             status: nextAppState,
             permissions: props.route.params[2],
-            id: props.route.params[3]
+            id: props.route.params[3],
           }),
         });
 
@@ -170,8 +170,8 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         style={{
           alignItems: 'flex-start',
           backgroundColor: 'white',
-          marginTop: 20,
           marginBottom: 10,
+          paddingTop: 5,
           paddingLeft: 10,
         }}>
         <View style={{flexDirection: 'row'}}>
@@ -193,13 +193,12 @@ const HuddleScreen = (props: any, {navigation}: any) => {
               style={{
                 alignSelf: 'flex-start',
                 flexDirection: 'row',
-                marginBottom: 10,
+                marginBottom: 5,
                 marginLeft: 10,
               }}
               key={props.route.params[3]}>
               <Text style={{fontWeight: 'bold'}}>{user.name}</Text>
               <Text>
-          
                 {user.status == 'active'
                   ? ' is in the huddle'
                   : ' is not with the team'}
@@ -245,7 +244,8 @@ const HuddleScreen = (props: any, {navigation}: any) => {
       <ScrollView persistentScrollbar={true} style={{height: 150}}>
         {huddleMessages.map((messageData) => {
           return (
-            <View style={{paddingLeft: 10}}>
+            <View style={{paddingLeft: 10, flexDirection: 'row'}}>
+              <Text style={{fontWeight: 'bold'}}>{messageData['name']}: </Text>
               <Text>{messageData['message']}</Text>
             </View>
           );
@@ -273,7 +273,8 @@ const HuddleScreen = (props: any, {navigation}: any) => {
               .doc(`${props.route.params[0]}`)
               .update({
                 messages: firestore.FieldValue.arrayUnion({
-                  message: `${props.route.params[1]}: ${messageState}`,
+                  name: props.route.params[1],
+                  message: `${messageState}`,
                   timestamp: Date.now(),
                 }),
               });
@@ -327,17 +328,43 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                   setTimer(startTime);
                 }}></TextInput>
 
-              <TouchableHighlight
-                style={{...styles.openButton, backgroundColor: '#ffbe5c'}}
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                  firestore()
-                    .collection('rooms')
-                    .doc(`${props.route.params[0]}`)
-                    .update({Duration: parseInt(timer) * 60});
-                }}>
-                <Text style={styles.textStyle}>Set Timer</Text>
-              </TouchableHighlight>
+              <View style={{flexDirection: 'row', marginTop: 10}}>
+                <TouchableHighlight
+                  style={{
+                    marginTop: 5,
+                    marginRight: 30,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    paddingRight: 30,
+                    paddingLeft: 30,
+                    borderRadius: 5,
+                    backgroundColor: '#ffbe5c',
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                    firestore()
+                      .collection('rooms')
+                      .doc(`${props.route.params[0]}`)
+                      .update({Duration: parseInt(timer) * 60});
+                  }}>
+                  <Text style={styles.textStyle}>Confirm</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                  style={{
+                    marginTop: 5,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    paddingRight: 30,
+                    paddingLeft: 30,
+                    borderRadius: 5,
+                    backgroundColor: '#ffbe5c',
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}>
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </TouchableHighlight>
+              </View>
             </View>
           </View>
         </Modal>
@@ -352,40 +379,43 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                 You are the host, if you leave, the room will be closed, are you
                 sure you want to leave?
               </Text>
-              <TouchableHighlight
-                style={{
-                  marginTop: 5,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  paddingRight: 30,
-                  paddingLeft: 30,
-                  borderRadius: 5,
-                  backgroundColor: '#ffbe5c',
-                }}
-                onPress={() => {
-                  setCloseRoomMessage(false);
-                  firestore()
-                    .collection('rooms')
-                    .doc(`${props.route.params[0]}`)
-                    .update({closed: true});
-                }}>
-                <Text style={styles.textStyle}>Confirm</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{
-                  marginTop: 5,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  paddingRight: 30,
-                  paddingLeft: 30,
-                  borderRadius: 5,
-                  backgroundColor: '#ffbe5c',
-                }}
-                onPress={() => {
-                  setCloseRoomMessage(false);
-                }}>
-                <Text style={styles.textStyle}>Cancel</Text>
-              </TouchableHighlight>
+              <View style={{flexDirection: 'row', marginTop: 10}}>
+                <TouchableHighlight
+                  style={{
+                    marginTop: 5,
+                    marginRight: 30,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    paddingRight: 30,
+                    paddingLeft: 30,
+                    borderRadius: 5,
+                    backgroundColor: '#ffbe5c',
+                  }}
+                  onPress={() => {
+                    setCloseRoomMessage(false);
+                    firestore()
+                      .collection('rooms')
+                      .doc(`${props.route.params[0]}`)
+                      .update({closed: true});
+                  }}>
+                  <Text style={styles.textStyle}>Confirm</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                  style={{
+                    marginTop: 5,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    paddingRight: 30,
+                    paddingLeft: 30,
+                    borderRadius: 5,
+                    backgroundColor: '#ffbe5c',
+                  }}
+                  onPress={() => {
+                    setCloseRoomMessage(false);
+                  }}>
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </TouchableHighlight>
+              </View>
             </View>
           </View>
         </Modal>
@@ -430,6 +460,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             setModalVisible(true);
           }}>
           <Text style={{color: 'white', fontSize: 14}}>Set Timer</Text>
+
           <FontAwesomeIcon icon={faClock} color="white" size={14} />
         </TouchableOpacity>
         <TouchableOpacity
