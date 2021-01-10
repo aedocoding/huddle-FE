@@ -26,12 +26,15 @@ import Timer from '../components/Timer';
 
 const HuddleScreen = (props: any, {navigation}: any) => {
   const [timer, setTimer] = useState('15');
+  const [duration, setDuration] = useState(0)
   const [users, setUsers] = useState([
     {name: '', status: '', permissions: '', id: 0},
   ]);
   const [session, setSession] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [notReadyMessage, setNotReadyMessage] = useState(false);
+  const [finish, setFinish] = useState(false);
+  const [finishMessage, setFinishMessage] = useState(false);
   const [closeRoomMessage, setCloseRoomMessage] = useState(false);
   const [permissionsModal, setPermissionsModal] = useState(false);
   const [messageState, setMessageState] = useState('');
@@ -67,6 +70,12 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         if (documentSnapshot.exists) {
           setHuddleMessages(firebase['messages']);
         }
+        if (documentSnapshot.exists) {
+          setDuration(firebase['Duration']);
+        }
+        if (documentSnapshot.exists) {
+          setFinish(firebase['finished']);
+        }
       });
     return () => roomListener();
   }, [closeRoom]);
@@ -84,7 +93,25 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         }),
       });
   }, []);
+useEffect(() => {
+  console.log(duration, session)
+  if(session === true && duration < 1){
+    firestore()
+          .collection('rooms')
+          .doc(`${props.route.params[0]}`)
+          .update({finished: true, active:false})
+  }
 
+},[duration])
+useEffect(() => {
+if (finish){
+  setFinishMessage(true)
+  firestore()
+  .collection('rooms')
+  .doc(`${props.route.params[0]}`)
+  .update({finished: false})
+}
+}, [finish])
   useEffect(() => {
     const checkPermissions = users.filter((user) => {
       return user.name == props.route.params[1];
@@ -329,6 +356,40 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
+      <Modal
+          animationType="fade"
+          transparent={true}
+          visible={finishMessage}
+          onRequestClose={() => {}}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+            <Text style={{marginBottom: 10, fontSize: 25}}>
+               🎉🎉🎉
+              </Text>
+              <Text style={{marginBottom: 10, fontSize: 25}}>
+               Your team made it to the end of the huddle! 🥳
+              </Text>
+              <Text style={{marginBottom: 10, fontSize: 25}}>
+               🎉🎉🎉
+              </Text>
+              <TouchableOpacity
+                style={{
+                  marginTop: 5,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  paddingRight: 30,
+                  paddingLeft: 30,
+                  borderRadius: 5,
+                  backgroundColor: '#ffbe5c',
+                }}
+                onPress={() => {
+                  setFinishMessage(false);
+                }}>
+                <Text style={styles.textStyle}>Ok</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
         <Modal
           animationType="fade"
           transparent={true}
