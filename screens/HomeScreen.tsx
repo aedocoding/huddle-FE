@@ -18,7 +18,7 @@ const HomeScreen = (props: any, {navigation}: any) => {
   const [closedModal, setClosedModal] = useState(false);
 
   useEffect(() => {
-    if ('0' in props.route.params) {
+    if (props.route.params) {
       if (props.route.params[0] == true) {
         setClosedModal(true);
         props.route.params[0] = false;
