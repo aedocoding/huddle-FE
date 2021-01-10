@@ -16,14 +16,14 @@ const logo = require('../logo.png');
 
 const HomeScreen = (props: any, {navigation}: any) => {
   const [closedModal, setClosedModal] = useState(false);
+  
   useEffect(() => {
-    console.log(props.route.params)
     if (props.route.params[0] == true){
       setClosedModal(true)
       props.route.params[0] = false
       console.log(props.route.params[0])
     }
-  },[props.route.params[0]])
+  },[props.route.params])
   return (
     <SafeAreaView>
       <View style={{alignItems: 'center', marginTop: 40}}>
