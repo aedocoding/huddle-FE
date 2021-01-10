@@ -12,7 +12,7 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHome} from '@fortawesome/free-solid-svg-icons';
 import firestore from '@react-native-firebase/firestore';
-const JoinHuddleScreen = ({navigation}) => {
+const JoinHuddleScreen = (props: any, {navigation}: any) => {
   const [invite, setInvite] = useState('');
   const [username, setUsername] = useState('');
   const [modalMessage, setModalMessage] = useState(false);
@@ -59,7 +59,7 @@ const JoinHuddleScreen = ({navigation}) => {
                 .get()
                 .then((documentSnapshot) => {
                   if (documentSnapshot.exists) {
-                    navigation.navigate('Huddle', [
+                    props.navigation.navigate('Huddle', [
                       invite,
                       username,
                       'participant',
@@ -77,7 +77,7 @@ const JoinHuddleScreen = ({navigation}) => {
           <TouchableOpacity
             style={styles.joinButton}
             onPress={() => {
-              navigation.navigate('Home');
+              props.navigation.navigate('Home');
             }}>
             <Text style={{color: 'white', fontSize: 15}}>
               {' '}

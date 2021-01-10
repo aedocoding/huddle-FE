@@ -26,7 +26,9 @@ import Timer from '../components/Timer';
 
 const HuddleScreen = (props: any, {navigation}: any) => {
   const [timer, setTimer] = useState('15');
-  const [duration, setDuration] = useState(0)
+  const [duration, setDuration] = useState(0);
+  const [checkBoot, setCheckBoot] = useState(false);
+  const [bootcount, setBootcount] = useState(0);
   const [users, setUsers] = useState([
     {name: '', status: '', permissions: '', id: 0},
   ]);
@@ -76,9 +78,15 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         if (documentSnapshot.exists) {
           setFinish(firebase['finished']);
         }
+        if (documentSnapshot.exists) {
+          setCheckBoot(firebase['bootcheck']);
+        }
+        if (documentSnapshot.exists) {
+          setBootcount(firebase['bootcounter']);
+        }
       });
     return () => roomListener();
-  }, [closeRoom]);
+  }, []);
   useEffect(() => {
     const myUsername = props.route.params[1];
     firestore()
@@ -93,32 +101,75 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         }),
       });
   }, []);
-useEffect(() => {
-  if(session === true && duration < 1){
-    firestore()
+  useEffect(() => {
+    if (session === true && duration < 1) {
+      firestore()
+        .collection('rooms')
+        .doc(`${props.route.params[0]}`)
+        .update({finished: true, active: false})
+        .then(() => {});
+    }
+  }, [duration]);
+  useEffect(() => {
+    if (finish) {
+      setFinishMessage(true);
+      firestore()
+        .collection('rooms')
+        .doc(`${props.route.params[0]}`)
+        .update({finished: false});
+    }
+  }, [finish]);
+  useEffect(() => {
+    if (users.length > 0) {
+      const allUserStatusCheck = users.reduce(function (a, b) {
+        if (a.status && b.status == 'active') {
+          return a;
+        } else {
+          return {status: 'inactive'};
+        }
+      });
+      if (allUserStatusCheck.status == 'inactive') {
+        firestore()
           .collection('rooms')
           .doc(`${props.route.params[0]}`)
-          .update({finished: true, active:false})
-  }
-
-},[duration])
-useEffect(() => {
-if (finish){
-  setFinishMessage(true)
-  firestore()
-  .collection('rooms')
-  .doc(`${props.route.params[0]}`)
-  .update({finished: false})
-}
-}, [finish])
+          .update({bootcheck: true});
+      } else {
+        firestore()
+          .collection('rooms')
+          .doc(`${props.route.params[0]}`)
+          .update({bootcheck: false});
+      }
+    }
+    console.log(checkBoot);
+  }, [users]);
+  useEffect(() => {
+    if (checkBoot == true && bootcount < 20) {
+      firestore()
+        .collection('rooms')
+        .doc(`${props.route.params[0]}`)
+        .update({bootcounter: bootcount + 1});
+    } else if (bootcount >= 20) {
+      const stillActive = users.filter((user) => {
+        return user.status == 'active';
+      });
+      firestore()
+        .collection('rooms')
+        .doc(`${props.route.params[0]}`)
+        .update({Users: stillActive});
+      firestore()
+        .collection('rooms')
+        .doc(`${props.route.params[0]}`)
+        .update({bootcounter: 0, bootcheck: false});
+    }
+  }, [checkBoot, bootcount]);
   useEffect(() => {
     const checkPermissions = users.filter((user) => {
       return user.name == props.route.params[1];
     });
     if (closeRoom == true) {
-      const roomClosed = true
+      const roomClosed = true;
       props.navigation.navigate('Home', [roomClosed]);
-   
+
       if (checkPermissions[0]['permissions'] == 'host') {
         firestore()
           .collection('rooms')
@@ -186,9 +237,9 @@ if (finish){
         .doc(`${props.route.params[0]}`)
         .update({active: false});
     }
-    
+
     appState.current = nextAppState;
-    console.log(appState)
+    console.log(appState);
     setAppStateVisible(appState.current);
   };
 
@@ -356,22 +407,18 @@ if (finish){
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
-      <Modal
+        <Modal
           animationType="fade"
           transparent={true}
           visible={finishMessage}
           onRequestClose={() => {}}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-            <Text style={{marginBottom: 10, fontSize: 25}}>
-               🎉🎉🎉
-              </Text>
+              <Text style={{marginBottom: 10, fontSize: 25}}>🎉🎉🎉</Text>
               <Text style={{marginBottom: 10, fontSize: 25}}>
-               Your team made it to the end of the huddle! 🥳
+                Your team made it to the end of the huddle! 🥳
               </Text>
-              <Text style={{marginBottom: 10, fontSize: 25}}>
-               🎉🎉🎉
-              </Text>
+              <Text style={{marginBottom: 10, fontSize: 25}}>🎉🎉🎉</Text>
               <TouchableOpacity
                 style={{
                   marginTop: 5,

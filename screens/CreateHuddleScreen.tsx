@@ -11,7 +11,7 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHome} from '@fortawesome/free-solid-svg-icons';
-const CreateHuddleScreen = ({navigation}) => {
+const CreateHuddleScreen = (props:any, {navigation} :any) => {
   const [room, setRoom] = useState('');
   const [username, setUsername] = useState('');
   const [modalMessage, setModalMessage] = useState(false);
@@ -101,10 +101,12 @@ const CreateHuddleScreen = ({navigation}) => {
                       active: false,
                       messages: [],
                       closed: false,
-                      finished: false
+                      finished: false,
+                      bootcheck: false,
+                      bootcounter: 0
                     })
                     .then(() => {
-                      navigation.navigate('Huddle', [
+                      props.navigation.navigate('Huddle', [
                         room,
                         username,
                         'host',
@@ -121,7 +123,7 @@ const CreateHuddleScreen = ({navigation}) => {
         <TouchableOpacity
           style={styles.createButton}
           onPress={() => {
-            navigation.navigate('Home');
+            props.navigation.navigate('Home');
           }}>
           <Text style={{color: 'white', fontSize: 15}}>
             {' '}
