@@ -16,14 +16,16 @@ const logo = require('../logo.png');
 
 const HomeScreen = (props: any, {navigation}: any) => {
   const [closedModal, setClosedModal] = useState(false);
-  
+
   useEffect(() => {
-    if (props.route.params[0] == true){
-      setClosedModal(true)
-      props.route.params[0] = false
-      console.log(props.route.params[0])
+    if ('0' in props.route.params) {
+      if (props.route.params[0] == true) {
+        setClosedModal(true);
+        props.route.params[0] = false;
+        console.log(props.route.params[0]);
+      }
     }
-  },[props.route.params])
+  }, [props.route.params]);
   return (
     <SafeAreaView>
       <View style={{alignItems: 'center', marginTop: 40}}>
@@ -41,9 +43,7 @@ const HomeScreen = (props: any, {navigation}: any) => {
         onRequestClose={() => {}}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={{marginBottom: 10}}>
-              Host has closed the room.
-            </Text>
+            <Text style={{marginBottom: 10}}>Host has closed the room.</Text>
             <TouchableOpacity
               style={{
                 marginTop: 5,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
- 
+
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
