@@ -94,7 +94,6 @@ const HuddleScreen = (props: any, {navigation}: any) => {
       });
   }, []);
 useEffect(() => {
-  console.log(duration, session)
   if(session === true && duration < 1){
     firestore()
           .collection('rooms')
@@ -187,8 +186,9 @@ if (finish){
         .doc(`${props.route.params[0]}`)
         .update({active: false});
     }
-
+    
     appState.current = nextAppState;
+    console.log(appState)
     setAppStateVisible(appState.current);
   };
 
