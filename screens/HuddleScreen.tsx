@@ -7,7 +7,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  TouchableHighlight,
   TextInput,
   Modal,
 } from 'react-native';
@@ -15,9 +14,10 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faUsers} from '@fortawesome/free-solid-svg-icons';
 import {faPlay} from '@fortawesome/free-solid-svg-icons';
 import {faStop} from '@fortawesome/free-solid-svg-icons';
+import {faCrown} from '@fortawesome/free-solid-svg-icons';
+import {faCircle} from '@fortawesome/free-solid-svg-icons';
 import {faClock} from '@fortawesome/free-solid-svg-icons';
-import {faCheck} from '@fortawesome/free-solid-svg-icons';
-import {faTimes} from '@fortawesome/free-solid-svg-icons';
+import {faUser} from '@fortawesome/free-solid-svg-icons';
 import {faCommentDots} from '@fortawesome/free-solid-svg-icons';
 import {faArrowRight} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
@@ -33,6 +33,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [notReadyMessage, setNotReadyMessage] = useState(false);
   const [closeRoomMessage, setCloseRoomMessage] = useState(false);
+  const [permissionsModal, setPermissionsModal] = useState(false);
   const [messageState, setMessageState] = useState('');
   const [huddleMessages, setHuddleMessages] = useState([
     {name: '', message: '', timestamp: 0},
@@ -89,7 +90,9 @@ const HuddleScreen = (props: any, {navigation}: any) => {
       return user.name == props.route.params[1];
     });
     if (closeRoom == true) {
-      props.navigation.navigate('Home');
+      const roomClosed = true
+      props.navigation.navigate('Home', [roomClosed]);
+   
       if (checkPermissions[0]['permissions'] == 'host') {
         firestore()
           .collection('rooms')
@@ -189,34 +192,49 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           return (
             <View
               style={{
-                alignSelf: 'flex-end',
+                alignSelf: 'flex-start',
                 flexDirection: 'row',
                 marginBottom: 5,
                 marginLeft: 10,
-                marginRight: 135
+                marginRight: 110,
               }}
-              key={props.route.params[3]}>
+              key={Math.random() * 1000}>
+              {user.status == 'active' ? (
+                <FontAwesomeIcon
+                  style={{marginLeft: 5, marginTop: 5}}
+                  icon={faCircle}
+                  color="green"
+                  size={10}
+                />
+              ) : (
+                <FontAwesomeIcon
+                  style={{marginLeft: 5, marginTop: 5}}
+                  icon={faCircle}
+                  color="red"
+                  size={10}
+                />
+              )}
+              {user.permissions == 'host' ? (
+                <FontAwesomeIcon
+                  style={{marginLeft: 5, marginTop: 2, marginRight: 5}}
+                  icon={faCrown}
+                  color="gold"
+                  size={14}
+                />
+              ) : (
+                <FontAwesomeIcon
+                  style={{marginLeft: 5, marginTop: 3, marginRight: 5}}
+                  icon={faUser}
+                  color="#ffbe5c"
+                  size={14}
+                />
+              )}
               <Text style={{fontWeight: 'bold'}}>{user.name}</Text>
               <Text>
                 {user.status == 'active'
                   ? ' is in the huddle'
                   : ' is not with the team'}
               </Text>
-              {user.status == 'active' ? (
-                <FontAwesomeIcon
-                  style={{marginLeft: 5, marginTop: 2}}
-                  icon={faCheck}
-                  color="green"
-                  size={14}
-                />
-              ) : (
-                <FontAwesomeIcon
-                  style={{marginLeft: 5, marginTop: 3}}
-                  icon={faTimes}
-                  color="red"
-                  size={14}
-                />
-              )}
             </View>
           );
         })}
@@ -225,44 +243,52 @@ const HuddleScreen = (props: any, {navigation}: any) => {
       <View
         style={{
           flexDirection: 'row',
-          alignContent: 'center',
+          justifyContent: 'space-between',
           backgroundColor: 'white',
+          width: '100%',
           marginBottom: 5,
           paddingLeft: 10,
         }}>
-        <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
-          Chat
-        </Text>
-        <FontAwesomeIcon
-          style={{marginLeft: 5, marginTop: 2}}
-          icon={faCommentDots}
-          color="#ffbe5c"
-          size={14}
-        />
+        <View style={{flexDirection: 'row'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 20, color: '#ffbe5c'}}>
+            Chat
+          </Text>
+          <FontAwesomeIcon
+            style={{marginLeft: 5, marginTop: 2}}
+            icon={faCommentDots}
+            color="#ffbe5c"
+            size={14}
+          />
+        </View>
+
+        <Timer session={session} room={props.route.params[0]} />
       </View>
-      <ScrollView persistentScrollbar={true} style={{height: 150}}>
+
+      <ScrollView
+        persistentScrollbar={true}
+        style={{height: 150, width: '100%'}}>
         {huddleMessages.map((messageData) => {
           return (
             <View style={{paddingLeft: 10, flexDirection: 'row'}}>
               <Text style={{fontWeight: 'bold'}}>{messageData['name']}: </Text>
-              <Text>{messageData['message']}</Text>
+              <Text style={{flex: 1, flexWrap: 'wrap'}}>
+                {messageData['message']}
+              </Text>
             </View>
           );
         })}
       </ScrollView>
-      <View style={{alignItems: 'center', marginBottom: 15}}>
-        <Timer session={session} room={props.route.params[0]} />
-      </View>
       <View
         style={{
           flexDirection: 'row',
-          alignContent: 'space-between',
+          justifyContent: 'space-between',
           backgroundColor: 'white',
+          marginBottom: 25,
         }}>
         <TextInput
           value={messageState}
           placeholder={'Send a message'}
-          style={{width: '92.5%', paddingLeft: 10}}
+          style={{width: '88%', paddingLeft: 10}}
           onChangeText={(message: string) => {
             setMessageState(message);
           }}
@@ -280,11 +306,57 @@ const HuddleScreen = (props: any, {navigation}: any) => {
             setMessageState('');
           }}
         />
-        <TouchableOpacity style={{paddingTop: 18}}>
-          <FontAwesomeIcon icon={faArrowRight} color="#ffbe5c" size={14} />
+        <TouchableOpacity
+          style={{
+            padding: '4.5%',
+            backgroundColor: '#ffbe5c',
+            borderRadius: 10,
+          }}
+          onPress={() => {
+            firestore()
+              .collection('rooms')
+              .doc(`${props.route.params[0]}`)
+              .update({
+                messages: firestore.FieldValue.arrayUnion({
+                  name: props.route.params[1],
+                  message: `${messageState}`,
+                  timestamp: Date.now(),
+                }),
+              });
+            setMessageState('');
+          }}>
+          <FontAwesomeIcon icon={faArrowRight} color="white" size={12} />
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={permissionsModal}
+          onRequestClose={() => {}}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={{marginBottom: 10}}>
+                Only the host has timer permissions!
+              </Text>
+              <TouchableOpacity
+                style={{
+                  marginTop: 5,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  paddingRight: 30,
+                  paddingLeft: 30,
+                  borderRadius: 5,
+                  backgroundColor: '#ffbe5c',
+                }}
+                onPress={() => {
+                  setPermissionsModal(false);
+                }}>
+                <Text style={styles.textStyle}>Ok</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
         <Modal
           animationType="fade"
           transparent={true}
@@ -295,7 +367,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
               <Text>
                 Please get everyone in the Huddle before starting session!
               </Text>
-              <TouchableHighlight
+              <TouchableOpacity
                 style={{
                   marginTop: 5,
                   paddingTop: 10,
@@ -309,7 +381,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                   setNotReadyMessage(false);
                 }}>
                 <Text style={styles.textStyle}>Ok</Text>
-              </TouchableHighlight>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
@@ -320,15 +392,20 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           onRequestClose={() => {}}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <TextInput
-                style={styles.modalText}
-                value={timer}
-                onChangeText={(startTime) => {
-                  setTimer(startTime);
-                }}></TextInput>
+              <View style={{flexDirection: 'row'}}>
+                <TextInput
+                  style={styles.modalText2}
+                  value={timer}
+                  keyboardType={'numeric'}
+                  onChangeText={(startTime) => {
+                    setTimer(startTime);
+                  }}
+                />
+                <Text style={{paddingTop: 15}}>minutes</Text>
+              </View>
 
               <View style={{flexDirection: 'row', marginTop: 10}}>
-                <TouchableHighlight
+                <TouchableOpacity
                   style={{
                     marginTop: 5,
                     marginRight: 30,
@@ -347,8 +424,8 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                       .update({Duration: parseInt(timer) * 60});
                   }}>
                   <Text style={styles.textStyle}>Confirm</Text>
-                </TouchableHighlight>
-                <TouchableHighlight
+                </TouchableOpacity>
+                <TouchableOpacity
                   style={{
                     marginTop: 5,
                     paddingTop: 10,
@@ -362,7 +439,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                     setModalVisible(!modalVisible);
                   }}>
                   <Text style={styles.textStyle}>Cancel</Text>
-                </TouchableHighlight>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -379,7 +456,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                 sure you want to leave?
               </Text>
               <View style={{flexDirection: 'row', marginTop: 10}}>
-                <TouchableHighlight
+                <TouchableOpacity
                   style={{
                     marginTop: 5,
                     marginRight: 30,
@@ -398,8 +475,8 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                       .update({closed: true});
                   }}>
                   <Text style={styles.textStyle}>Confirm</Text>
-                </TouchableHighlight>
-                <TouchableHighlight
+                </TouchableOpacity>
+                <TouchableOpacity
                   style={{
                     marginTop: 5,
                     paddingTop: 10,
@@ -413,7 +490,7 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                     setCloseRoomMessage(false);
                   }}>
                   <Text style={styles.textStyle}>Cancel</Text>
-                </TouchableHighlight>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -421,6 +498,14 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         <TouchableOpacity
           style={styles.playButton}
           onPress={() => {
+            const checkPermissions = users.filter((user) => {
+              if (
+                user.name == props.route.params[1] &&
+                user.id == props.route.params[3]
+              ) {
+                return user;
+              }
+            });
             const allUserStatusCheck = users.reduce(function (a, b) {
               if (a.status && b.status == 'active') {
                 return a;
@@ -428,12 +513,17 @@ const HuddleScreen = (props: any, {navigation}: any) => {
                 return {status: 'inactive'};
               }
             });
-            if (allUserStatusCheck.status == 'active') {
+            if (
+              allUserStatusCheck.status == 'active' &&
+              checkPermissions[0]['permissions'] == 'host'
+            ) {
               firestore()
                 .collection('rooms')
                 .doc(`${props.route.params[0]}`)
                 .update({active: true});
-            } else {
+            } else if (checkPermissions[0]['permissions'] != 'host') {
+              setPermissionsModal(true);
+            } else if (allUserStatusCheck.status != 'active') {
               setNotReadyMessage(true);
             }
           }}>
@@ -443,10 +533,22 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         <TouchableOpacity
           style={styles.playButton}
           onPress={() => {
-            firestore()
-              .collection('rooms')
-              .doc(`${props.route.params[0]}`)
-              .update({active: false});
+            const checkPermissions = users.filter((user) => {
+              if (
+                user.name == props.route.params[1] &&
+                user.id == props.route.params[3]
+              ) {
+                return user;
+              }
+            });
+            if (checkPermissions[0]['permissions'] == 'host') {
+              firestore()
+                .collection('rooms')
+                .doc(`${props.route.params[0]}`)
+                .update({active: false});
+            } else {
+              setPermissionsModal(true);
+            }
           }}>
           <Text style={{color: 'white', fontSize: 14}}>Stop Session</Text>
           <FontAwesomeIcon icon={faStop} color="white" size={14} />
@@ -456,7 +558,19 @@ const HuddleScreen = (props: any, {navigation}: any) => {
         <TouchableOpacity
           style={styles.playButton}
           onPress={() => {
-            setModalVisible(true);
+            const checkPermissions = users.filter((user) => {
+              if (
+                user.name == props.route.params[1] &&
+                user.id == props.route.params[3]
+              ) {
+                return user;
+              }
+            });
+            if (checkPermissions[0]['permissions'] == 'host') {
+              setModalVisible(true);
+            } else {
+              setPermissionsModal(true);
+            }
           }}>
           <Text style={{color: 'white', fontSize: 14}}>Set Timer</Text>
 
@@ -553,6 +667,14 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  modalText2: {
+    marginBottom: 15,
+    textAlign: 'center',
+    color: '#ffbe5c',
+    fontSize: 20,
+    fontWeight: 'bold',
+    // backgroundColor: '#F2EEEE',
   },
 });
 export default HuddleScreen;

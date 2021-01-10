@@ -1,6 +1,8 @@
 import React from 'react';
 import {useState, useEffect} from 'react';
 import {View, Text} from 'react-native';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faStopwatch} from '@fortawesome/free-solid-svg-icons';
 import firestore from '@react-native-firebase/firestore';
 const Timer = (props: any) => {
   const [duration, setDuration] = useState(0);
@@ -56,9 +58,19 @@ const Timer = (props: any) => {
 
   return (
     <View
-      style={{backgroundColor: 'white', width: '100%', alignItems: 'center'}}>
+      style={{
+        backgroundColor: 'white',
+        flexDirection: 'row',
+        paddingRight: 10,
+      }}>
+      <FontAwesomeIcon
+        style={{marginLeft: 5, marginTop: 6}}
+        icon={faStopwatch}
+        color="#ffbe5c"
+        size={18}
+      />
       {minutes === 0 && seconds === 0 ? null : (
-        <Text style={{fontWeight: 'bold', fontSize: 50, color: '#ffbe5c'}}>
+        <Text style={{fontWeight: 'bold', fontSize: 18, color: '#ffbe5c'}}>
           {' '}
           {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
         </Text>

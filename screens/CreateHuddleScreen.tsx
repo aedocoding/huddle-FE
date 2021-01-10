@@ -100,6 +100,7 @@ const CreateHuddleScreen = ({navigation}) => {
                       Duration: 900,
                       active: false,
                       messages: [],
+                      closed: false,
                     })
                     .then(() => {
                       navigation.navigate('Huddle', [
