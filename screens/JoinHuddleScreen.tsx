@@ -32,7 +32,6 @@ const JoinHuddleScreen = (props: any, {navigation}: any) => {
               value={invite}
               onChangeText={(inviteCode: string) => {
                 setInvite(inviteCode);
-                console.log(invite);
               }}></TextInput>
           </View>
         </View>
@@ -45,7 +44,6 @@ const JoinHuddleScreen = (props: any, {navigation}: any) => {
               value={username}
               onChangeText={(name: string) => {
                 setUsername(name);
-                console.log(username);
               }}></TextInput>
           </View>
         </View>

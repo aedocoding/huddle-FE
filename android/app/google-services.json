@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "708709409739",
+    "firebase_url": "https://gameplays-app-default-rtdb.firebaseio.com",
     "project_id": "gameplays-app",
     "storage_bucket": "gameplays-app.appspot.com"
   },
@@ -9,7 +10,36 @@
       "client_info": {
         "mobilesdk_app_id": "1:708709409739:android:0dd338d85ee89453c04c4e",
         "android_client_info": {
-          "package_name": "com.huddle"
+          "package_name":"com.huddleapp.us"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708709409739-3m9a0hi2gf0p8q4f7amouh4iia9lthpi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB39ThxwwTl3R7wRXA07DKCs-um8KsXkHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708709409739-3m9a0hi2gf0p8q4f7amouh4iia9lthpi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708709409739:android:4dcb18218dcc1baac04c4e",
+        "android_client_info": {
+          "package_name": "com.huddleapp.us"
         }
       },
       "oauth_client": [

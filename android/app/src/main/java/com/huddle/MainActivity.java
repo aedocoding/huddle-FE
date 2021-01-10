@@ -1,4 +1,4 @@
-package com.huddle;
+package com.huddleapp.us;
 
 import com.facebook.react.ReactActivity;
 

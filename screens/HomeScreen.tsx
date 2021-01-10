@@ -22,7 +22,6 @@ const HomeScreen = (props: any, {navigation}: any) => {
       if (props.route.params[0] == true) {
         setClosedModal(true);
         props.route.params[0] = false;
-        console.log(props.route.params[0]);
       }
     }
   }, [props.route.params]);

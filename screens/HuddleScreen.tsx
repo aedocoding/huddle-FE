@@ -140,7 +140,6 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           .update({bootcheck: false});
       }
     }
-    console.log(checkBoot);
   }, [users]);
   useEffect(() => {
     if (checkBoot == true && bootcount < 120) {
@@ -176,7 +175,6 @@ const HuddleScreen = (props: any, {navigation}: any) => {
           .doc(`${props.route.params[0]}`)
           .delete()
           .then(() => {
-            console.log(`${props.route.params[0]} was deleted`);
           });
       }
     }
@@ -239,7 +237,6 @@ const HuddleScreen = (props: any, {navigation}: any) => {
     }
 
     appState.current = nextAppState;
-    console.log(appState);
     setAppStateVisible(appState.current);
   };
 

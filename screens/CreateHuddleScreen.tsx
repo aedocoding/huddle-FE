@@ -28,7 +28,6 @@ const CreateHuddleScreen = (props:any, {navigation} :any) => {
             value={room}
             onChangeText={(roomCode: string) => {
               setRoom(roomCode);
-              console.log(room);
             }}></TextInput>
         </View>
       </View>
@@ -41,7 +40,6 @@ const CreateHuddleScreen = (props:any, {navigation} :any) => {
             value={username}
             onChangeText={(name: string) => {
               setUsername(name);
-              console.log(username);
             }}></TextInput>
         </View>
       </View>

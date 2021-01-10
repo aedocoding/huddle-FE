@@ -10,4 +10,4 @@ import {createStore, applyMiddleware} from "redux"
 import thunk from "redux-thunk"
 import {name as appName} from './app.json';
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent('huddle', () => App);
