@@ -143,12 +143,12 @@ const HuddleScreen = (props: any, {navigation}: any) => {
     console.log(checkBoot);
   }, [users]);
   useEffect(() => {
-    if (checkBoot == true && bootcount < 20) {
+    if (checkBoot == true && bootcount < 120) {
       firestore()
         .collection('rooms')
         .doc(`${props.route.params[0]}`)
         .update({bootcounter: bootcount + 1});
-    } else if (bootcount >= 20) {
+    } else if (bootcount >= 120) {
       const stillActive = users.filter((user) => {
         return user.status == 'active';
       });
