@@ -1,5 +1,5 @@
 # huddle-FE
-[Android Play Store Link](https://play.google.com/store/apps/details?id=com.huddleapp.us)
+# [Android Play Store Link](https://play.google.com/store/apps/details?id=com.huddleapp.us)
 
 Facebook, TikTok, Snapchat, Instagram, Reddit, the list of ways to distract yourself with your phone are never ending!
 
