@@ -1,4 +1,5 @@
 # huddle-FE
+(Android Play Store Link)[https://play.google.com/store/apps/details?id=com.huddleapp.us]
 Facebook, TikTok, Snapchat, Instagram, Reddit, the list of ways to distract yourself with your phone are never ending!
 
 Introducing Huddle, the app made to keep you off of those apps and on task with whatever goal your group is setting.
